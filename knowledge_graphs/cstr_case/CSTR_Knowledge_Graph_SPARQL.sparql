@@ -1,0 +1,347 @@
+# ============================================================================
+#
+#   CSTR KNOWLEDGE GRAPH - SPARQL CONSTRUCT QUERIES FOR LLM AGENT
+#
+# ============================================================================
+#
+# These CONSTRUCT queries generate RDF subgraphs that can be directly
+# processed by an LLM agent or integrated into other knowledge graphs.
+#
+# QUERY 1: Process Overview (CONSTRUCT)
+#          → Returns RDF triples describing process structure and behavior
+#
+# QUERY 2: State Machine (CONSTRUCT)
+#          → Returns RDF triples describing operational phases and transitions
+#
+# ============================================================================
+
+
+
+
+# ****************************************************************************
+#
+#   QUERY 1: CSTR PROCESS OVERVIEW (CONSTRUCT)
+#
+# ****************************************************************************
+#
+# PURPOSE:
+# --------
+# This CONSTRUCT query generates an RDF subgraph containing all relevant
+# process information for an LLM agent, including:
+#
+#   1. ProcessOperators with their labels
+#   2. Input/Output relationships
+#   3. MathematicalModels with equations
+#   4. Parameters (Observable/Actuatable)
+#   5. Setpoint values
+#   6. Module and Component assignments
+#
+# ****************************************************************************
+
+PREFIX : <http://example.org/cstr#>
+PREFIX VDI3682: <http://www.w3id.org/hsu-aut/VDI3682#>
+PREFIX VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#>
+PREFIX CPSMod: <http://www.hsu-ifa.de/ontologies/CPSMod#>
+PREFIX DIN17359: <http://www.hsu-ifa.de/ontologies/DIN17359#>
+PREFIX DINEN61360: <http://www.hsu-ifa.de/ontologies/DINEN61360#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+CONSTRUCT {
+    # ========================================================================
+    # PROCESS OPERATOR: Core entity with label
+    # ========================================================================
+    ?processOp rdf:type VDI3682:ProcessOperator .
+    ?processOp rdfs:label ?poLabel .
+    
+    # ========================================================================
+    # INPUTS AND OUTPUTS: Material, energy, information flows
+    # ========================================================================
+    ?processOp VDI3682:hasInput ?input .
+    ?processOp VDI3682:hasOutput ?output .
+    
+    # ========================================================================
+    # MATHEMATICAL MODELS: Behavior equations for causal reasoning
+    # ========================================================================
+    ?processOp CPSMod:processRealizesBehavior ?mathModel .
+    ?mathModel rdf:type VDI2206:MathematicalModel .
+    ?mathModel rdfs:label ?mathModelLabel .
+    
+    # ========================================================================
+    # PARAMETERS: Observable and Actuatable properties
+    # ========================================================================
+    ?info CPSMod:isCharacterizedByParameter ?parameter .
+    ?parameter rdf:type DIN17359:Parameter .
+    ?parameter rdf:type ?parameterType .
+    
+    # ========================================================================
+    # SETPOINTS: Target values with reference values
+    # ========================================================================
+    ?spInfo owl:sameAs ?refValue .
+    ?refValue DIN17359:referenceValue ?spValue .
+    
+    # ========================================================================
+    # MODULES: Physical subsystem grouping
+    # ========================================================================
+    ?processOp VDI3682:isAssignedTo ?module .
+    ?module rdf:type VDI2206:Module .
+    
+    # ========================================================================
+    # COMPONENTS: Hardware elements (Sensors, Actuators, Controllers)
+    # ========================================================================
+    ?module VDI2206:ModuleConsistsOfComponent ?component .
+    ?component rdf:type ?componentType .
+}
+
+FROM <http://www.hsu-ifa.de/graphs/CSTR_Simulation>
+
+WHERE {
+    # ========================================================================
+    # BASE: Get all ProcessOperators (VDI 3682)
+    # ========================================================================
+    ?processOp a VDI3682:ProcessOperator .
+    OPTIONAL { ?processOp rdfs:label ?poLabel }
+    
+    # ========================================================================
+    # INPUTS: Material, energy, and information flows entering the PO
+    # ========================================================================
+    OPTIONAL { ?processOp VDI3682:hasInput ?input }
+    
+    # ========================================================================
+    # OUTPUTS: Material, energy, and information flows leaving the PO
+    # ========================================================================
+    OPTIONAL { ?processOp VDI3682:hasOutput ?output }
+    
+    # ========================================================================
+    # MATHEMATICAL MODELS: Equations describing the PO behavior
+    # ========================================================================
+    OPTIONAL { 
+        ?processOp CPSMod:processRealizesBehavior ?mathModel .
+        ?mathModel rdfs:label ?mathModelLabel .
+    }
+    
+    # ========================================================================
+    # PARAMETERS: Observable and Actuatable properties (DIN 17359 + SOSA)
+    # ========================================================================
+    OPTIONAL {
+        {
+            ?processOp VDI3682:hasInput ?info .
+            ?info CPSMod:isCharacterizedByParameter ?parameter .
+        }
+        UNION
+        {
+            ?processOp VDI3682:hasOutput ?info .
+            ?info CPSMod:isCharacterizedByParameter ?parameter .
+        }
+        
+        ?parameter a DIN17359:Parameter .
+        
+        # Get the specific parameter type (Observable or Actuatable)
+        OPTIONAL { 
+            ?parameter a sosa:ObservableProperty .
+            BIND(sosa:ObservableProperty AS ?parameterType)
+        }
+        OPTIONAL { 
+            ?parameter a sosa:ActuatableProperty .
+            BIND(sosa:ActuatableProperty AS ?parameterType)
+        }
+    }
+    
+    # ========================================================================
+    # SETPOINTS: Target values for PID controllers
+    # ========================================================================
+    OPTIONAL {
+        ?processOp VDI3682:hasInput ?spInfo .
+        FILTER(CONTAINS(STR(?spInfo), "_sp"))
+        ?spInfo owl:sameAs ?refValue .
+        ?refValue DIN17359:referenceValue ?spValue .
+    }
+    
+    # ========================================================================
+    # MODULES: Physical grouping of components (VDI 2206)
+    # ========================================================================
+    OPTIONAL {
+        ?processOp VDI3682:isAssignedTo ?module .
+        ?module a VDI2206:Module .
+    }
+    
+    # ========================================================================
+    # COMPONENTS: Hardware elements within modules
+    # ========================================================================
+    OPTIONAL {
+        ?processOp VDI3682:isAssignedTo ?mod .
+        ?mod VDI2206:ModuleConsistsOfComponent ?component .
+        
+        # Get the specific component type
+        OPTIONAL { 
+            ?component a VDI2206:Sensor .
+            BIND(VDI2206:Sensor AS ?componentType)
+        }
+        OPTIONAL { 
+            ?component a VDI2206:Actuator .
+            BIND(VDI2206:Actuator AS ?componentType)
+        }
+        OPTIONAL { 
+            ?component a VDI2206:InformationProcessing .
+            BIND(VDI2206:InformationProcessing AS ?componentType)
+        }
+    }
+}
+
+# ============================================================================
+# QUERY 1 - EXPECTED OUTPUT (RDF TRIPLES)
+# ============================================================================
+#
+# Example output triples for PO7_TempPID:
+#
+# :PO7_TempPID rdf:type VDI3682:ProcessOperator .
+# :PO7_TempPID rdfs:label "PO7 – Temperature PID Controller"@en .
+# :PO7_TempPID VDI3682:hasInput :information_T_meas .
+# :PO7_TempPID VDI3682:hasInput :information_T_sp .
+# :PO7_TempPID VDI3682:hasOutput :information_u_cool_cmd .
+# :PO7_TempPID CPSMod:processRealizesBehavior :Equation_PO7_TempPID .
+# :Equation_PO7_TempPID rdf:type VDI2206:MathematicalModel .
+# :Equation_PO7_TempPID rdfs:label "u_cool = Kp_T × e + Ki_T × ∫e dt..."@en .
+# :information_T_meas CPSMod:isCharacterizedByParameter :obs_param_T_meas .
+# :obs_param_T_meas rdf:type DIN17359:Parameter .
+# :obs_param_T_meas rdf:type sosa:ObservableProperty .
+# :information_T_sp owl:sameAs :ref_T_sp .
+# :ref_T_sp DIN17359:referenceValue 3.1E2 .
+# :PO7_TempPID VDI3682:isAssignedTo :module_Cooling .
+# :module_Cooling VDI2206:ModuleConsistsOfComponent :controller_PID_T .
+# :controller_PID_T rdf:type VDI2206:InformationProcessing .
+#
+# ============================================================================
+
+
+
+
+# ****************************************************************************
+#
+#   QUERY 2: CSTR STATE MACHINE (CONSTRUCT)
+#
+# ****************************************************************************
+#
+# PURPOSE:
+# --------
+# This CONSTRUCT query generates an RDF subgraph containing the complete
+# state machine model, including:
+#
+#   1. Process reference
+#   2. StateMachine entity
+#   3. All States with labels and comments
+#   4. All Transitions with source, target, and guards
+#
+# ****************************************************************************
+
+PREFIX : <http://example.org/cstr#>
+PREFIX UML: <http://www.hsu-ifa.de/ontologies/UMLStateMachine#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX VDI3682: <http://www.w3id.org/hsu-aut/VDI3682#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+CONSTRUCT {
+    # ========================================================================
+    # PROCESS: The VDI 3682 Process this state machine belongs to
+    # ========================================================================
+    ?process rdf:type VDI3682:Process .
+    ?process rdfs:label ?processLabel .
+    
+    # ========================================================================
+    # STATE MACHINE: UML StateMachine entity
+    # ========================================================================
+    ?stateMachine rdf:type UML:StateMachine .
+    
+    # ========================================================================
+    # STATES: Operational phases (STARTUP, NORMAL, SHUTDOWN, FAULT)
+    # ========================================================================
+    ?state rdf:type UML:State .
+    ?state rdfs:label ?stateLabel .
+    ?state rdfs:comment ?stateComment .
+    
+    # ========================================================================
+    # TRANSITIONS: State changes with source, target, and guard conditions
+    # ========================================================================
+    ?transition rdf:type UML:Transition .
+    ?transition UML:source ?sourceState .
+    ?transition UML:target ?targetState .
+    ?transition UML:transitionGuard ?guard .
+}
+
+FROM <http://www.hsu-ifa.de/graphs/CSTR_Simulation>
+
+WHERE {
+    # ========================================================================
+    # PROCESS: Link to VDI 3682 Process (the CSTR system)
+    # ========================================================================
+    ?process a VDI3682:Process .
+    OPTIONAL { ?process rdfs:label ?processLabel }
+    
+    # ========================================================================
+    # STATE MACHINE: UML StateMachine controlling process phases
+    # ========================================================================
+    ?stateMachine a UML:StateMachine .
+    
+    # ========================================================================
+    # STATES AND TRANSITIONS: Retrieved via UNION pattern
+    # ========================================================================
+    {
+        # --------------------------------------------------------------------
+        # STATES: Operational phases of the CSTR
+        # --------------------------------------------------------------------
+        ?state a UML:State .
+        OPTIONAL { ?state rdfs:label ?stateLabel }
+        OPTIONAL { ?state rdfs:comment ?stateComment }
+    }
+    UNION
+    {
+        # --------------------------------------------------------------------
+        # TRANSITIONS: State changes with guard conditions
+        # --------------------------------------------------------------------
+        ?transition a UML:Transition ;
+                    UML:source ?sourceState ;
+                    UML:target ?targetState .
+        OPTIONAL { ?transition UML:transitionGuard ?guard }
+    }
+}
+
+# ============================================================================
+# QUERY 2 - EXPECTED OUTPUT (RDF TRIPLES)
+# ============================================================================
+#
+# Process and StateMachine:
+# :CSTR_Process rdf:type VDI3682:Process .
+# :CSTR_Process rdfs:label "CSTR Simulation Process"@en .
+# :CSTR_StateMachine rdf:type UML:StateMachine .
+#
+# States:
+# :state_STARTUP rdf:type UML:State .
+# :state_STARTUP rdfs:label "STARTUP Phase"@en .
+# :state_STARTUP rdfs:comment "Filling reactor, pump off..."@en .
+#
+# :state_NORMAL rdf:type UML:State .
+# :state_NORMAL rdfs:label "NORMAL Phase"@en .
+# :state_NORMAL rdfs:comment "Continuous operation..."@en .
+#
+# :state_SHUTDOWN rdf:type UML:State .
+# :state_FAULT rdf:type UML:State .
+#
+# Transitions:
+# :transition_startup_normal rdf:type UML:Transition .
+# :transition_startup_normal UML:source :state_STARTUP .
+# :transition_startup_normal UML:target :state_NORMAL .
+# :transition_startup_normal UML:transitionGuard "(L >= L_sp) OR (t >= 1000.0)" .
+#
+# :transition_normal_shutdown rdf:type UML:Transition .
+# :transition_normal_shutdown UML:source :state_NORMAL .
+# :transition_normal_shutdown UML:target :state_SHUTDOWN .
+# :transition_normal_shutdown UML:transitionGuard "t >= T_startup + T_normal" .
+#
+# :transition_normal_fault rdf:type UML:Transition .
+# :transition_normal_fault UML:source :state_NORMAL .
+# :transition_normal_fault UML:target :state_FAULT .
+# :transition_normal_fault UML:transitionGuard "fault_detected == True" .
+#
+# ============================================================================

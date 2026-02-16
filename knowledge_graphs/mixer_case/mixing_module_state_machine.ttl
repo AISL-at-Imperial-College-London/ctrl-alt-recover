@@ -1,0 +1,169 @@
+@prefix : <http://example.org/mixer#> .
+
+@prefix UML: <http://www.hsu-ifa.de/ontologies/UMLStateMachine#> .
+
+@prefix VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#> .
+
+@prefix VDI3682: <http://www.w3id.org/hsu-aut/VDI3682#> .
+
+@prefix CPSMod: <http://www.hsu-ifa.de/ontologies/CPSMod#> .
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix rdf4j: <http://rdf4j.org/schema/rdf4j#> .
+
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+ 
+:mixerModule1234 a VDI2206:Module;
+
+  rdfs:label "Mixer Module" .
+ 
+:mixing1234 a VDI3682:ProcessOperator;
+
+  VDI3682:isAssignedto :mixerModule1234;
+
+  CPSMod:processRealizesBehavior :MixerStateMachine .
+ 
+:MixerStateMachine a UML:StateMachine;
+
+  rdfs:label "mixerModule StateGraph describing the behavior of the Modva mixing Module process plant" .
+ 
+:condition_init_step a UML:Transition;
+
+  UML:sourceState :state_initialStep;
+
+  UML:targetState :state_filling_tank_B201;
+
+  UML:transitionEvent :e_init_step;
+
+  rdfs:label "condition_init_step" .
+ 
+:condition_is_full_tank_B201 a UML:Transition;
+
+  UML:sourceState :state_filling_tank_B201;
+
+  UML:targetState :state_filling_tank_B202;
+
+  UML:transitionEvent :e_full_B201;
+
+  rdfs:label "condition_is_full_tank_B201" .
+ 
+:state_filling_tank_B201 UML:doAction :act_open_valve_in0 .
+ 
+:act_open_valve_in0 a UML:Action;
+
+  rdfs:label "open valve_in0" .
+ 
+:condition_is_empty_tank_B204 a UML:Transition;
+
+  UML:sourceState :state_emptying_tank_B204;
+
+  UML:targetState :state_initialStep;
+
+  UML:transitionEvent :e_empty_B204;
+
+  rdfs:label "condition_is_empty_tank_B204" .
+ 
+:state_emptying_tank_B204 UML:doAction :act_valve_pump_B204_on, :act_open_valve_out .
+ 
+:act_valve_pump_B204_on a UML:Action;
+
+  rdfs:label "open valve_pump_tank_B204" .
+ 
+:act_open_valve_out a UML:Action;
+
+  rdfs:label "open valve_out" .
+ 
+:condition_is_full_tank_B202 a UML:Transition;
+
+  UML:sourceState :state_filling_tank_B202;
+
+  UML:targetState :state_filling_tank_B203;
+
+  UML:transitionEvent :e_full_B202;
+
+  rdfs:label "condition_is_full_tank_B202" .
+ 
+:state_filling_tank_B202 UML:doAction :act_open_valve_in1 .
+ 
+:act_open_valve_in1 a UML:Action;
+
+  rdfs:label "open valve_in1" .
+ 
+:condition_is_empty_tank_B203 a UML:Transition;
+
+  UML:sourceState :state_emptying_tank_B203;
+
+  UML:targetState :state_emptying_tank_B204;
+
+  UML:transitionEvent :e_empty_B203;
+
+  rdfs:label "condition_is_empty_tank_B203" .
+ 
+:state_emptying_tank_B203 UML:doAction :act_set_pump_speed, :act_valve_pump_B203_on .
+ 
+:act_set_pump_speed a UML:Action;
+
+  rdfs:label "set pump_P101 speed" .
+ 
+:act_valve_pump_B203_on a UML:Action;
+
+  rdfs:label "open valve_pump_tank_B203" .
+ 
+:condition_is_full_tank_B203 a UML:Transition;
+
+  UML:sourceState :state_filling_tank_B203;
+
+  UML:targetState :state_emptying_tank_B201;
+
+  UML:transitionEvent :e_full_B203;
+
+  rdfs:label "condition_is_full_tank_B203" .
+ 
+:state_filling_tank_B203 UML:doAction :act_open_valve_in2 .
+ 
+:act_open_valve_in2 a UML:Action;
+
+  rdfs:label "open valve_in2" .
+ 
+:condition_is_empty_tank_B202 a UML:Transition;
+
+  UML:sourceState :state_emptying_tank_B202;
+
+  UML:targetState :state_emptying_tank_B203;
+
+  UML:transitionEvent :e_empty_B202;
+
+  rdfs:label "condition_is_empty_tank_B202" .
+ 
+:state_emptying_tank_B202 UML:doAction :act_set_pump_speed, :act_valve_pump_B202_on .
+ 
+:act_valve_pump_B202_on a UML:Action;
+
+  rdfs:label "open valve_pump_tank_B202" .
+ 
+:condition_is_empty_tank_B201 a UML:Transition;
+
+  UML:sourceState :state_emptying_tank_B201;
+
+  UML:targetState :state_emptying_tank_B202;
+
+  UML:transitionEvent :e_empty_B201;
+
+  rdfs:label "condition_is_empty_tank_B201" .
+ 
+:state_emptying_tank_B201 UML:doAction :act_valve_pump_B201_on, :act_set_pump_speed .
+ 
+:act_valve_pump_B201_on a UML:Action;
+
+  rdfs:label "open valve_pump_tank_B201" .
+
+ 

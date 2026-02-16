@@ -1,0 +1,6 @@
+fault,variant,accuracy_mean,accuracy_std,reprompts_mean,reprompts_std,wall_time_mean,wall_time_std,planning_latency_mean,action_latency_mean,invalid_actuator_mean,steps_mean,itr_mean,sim_time_mean
+clogging_fault,full_system,1.0,0.0,0.0,0.0,0.0,0.0,7.636460309982067,16.880815510009416,0.0,7.0,7.0,9.610000000000001
+leak,full_system,1.0,0.0,0.0,0.0,0.0,0.0,8.037507789983646,19.550365200010127,0.0,7.0,7.0,9.670000000000002
+pump_degradation,full_system,1.0,0.0,0.0,0.0,0.0,0.0,8.488996280019638,18.06988819000544,0.0,7.0,7.0,9.510000000000002
+pump_failure,full_system,1.0,0.0,0.0,0.0,0.0,0.0,8.684565849986393,18.6520143900183,0.0,7.0,7.0,9.56
+sensor_fault,full_system,1.0,0.0,0.0,0.0,0.0,0.0,13.387514430005103,18.436334349995015,0.0,7.0,7.0,9.440000000000001
