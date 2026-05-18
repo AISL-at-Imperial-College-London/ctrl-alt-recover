@@ -61,14 +61,47 @@ The mixer case represents the plant as a finite state machine. The planning
 agent chooses the next UML state, and the action agent maps that target state to
 actuator commands.
 
-Typical faults include:
+The mixer evaluation is a discrete routing problem. Fault severity is encoded as
+whether the normal main-pump emptying path is still admissible or whether the
+agent must route through the bypass path. In this repository, the mixer fault
+labels are used by the supervisory/evaluation logic to select the expected
+state-machine path; numeric degradation magnitudes are handled by the external
+`mixer_module` simulator and are not redefined here.
 
-- `pump_failure`
-- `pump_degradation`
-- `clogging_fault`
-- `sensor_fault`
-- `leak`
-- `normal`
+| Fault | Modeled consequence | Expected recovery route |
+| --- | --- | --- |
+| `normal` | No fault; all normal transitions remain admissible. | Normal filling, then normal emptying with P101. |
+| `pump_failure` | Main pump P101 path is unavailable for emptying B201-B203. | Bypass emptying with P102. |
+| `pump_degradation` | Main pump P101 path is treated as insufficient for reliable emptying. | Bypass emptying with P102. |
+| `clogging_fault` | Main pump line is treated as blocked or unreliable. | Bypass emptying with P102. |
+| `leak` | Main pump line is treated as unsafe or unreliable for transfer. | Bypass emptying with P102. |
+| `sensor_fault` | The main pump path remains usable; the fault should not force bypass routing. | Normal emptying with P101. |
+
+The planning action space is the set of valid UML state instances in the
+knowledge graph:
+
+| Phase | Candidate states |
+| --- | --- |
+| Filling | `state_filling_tank_B201`, `state_filling_tank_B202`, `state_filling_tank_B203` |
+| Normal emptying | `state_emptying_tank_B201`, `state_emptying_tank_B202`, `state_emptying_tank_B203` |
+| Bypass emptying | `state_bypass_emptying_tank_b201`, `state_bypass_emptying_tank_b202`, `state_bypass_emptying_tank_b203` |
+| Final drain | `state_emptying_tank_B204` |
+
+The action agent then chooses actuator commands for the selected state. Before
+applying the proposal, the code resets all actuators to zero and applies only
+the actuators returned for the target state.
+
+| State type | Allowed actuator pattern |
+| --- | --- |
+| Filling B201-B203 | Open the matching inlet valve only, with both pumps off. |
+| Normal emptying B201-B203 | Open the matching outlet valve and use main pump P101. |
+| Bypass emptying B201-B203 | Open the matching outlet valve and use bypass pump P102. |
+| Final B204 emptying | Open the B204 outlet valve; pumps are off in the expected configuration. |
+
+The resulting action space is deliberately small but safety-critical: the agent
+must pick the correct route at the B203-to-emptying branch and must activate the
+actuators that match the selected state without inventing valves, pumps, or
+state names.
 
 Recovery is evaluated using expected state sequences, path selection
 (`normal` vs `bypass`), actuator correctness, physical feasibility, reprompt
@@ -85,11 +118,36 @@ only three setpoints:
 - `L_sp`: reactor level setpoint in L
 - `Fin_sp`: inlet flow setpoint in L/s
 
-Typical faults include:
+The CSTR evaluation is a continuous recovery problem. Faults are injected after
+startup, during the normal operating phase, with a random timing offset of
+approximately +/-200 s around 2000 s. The default nominal setpoints are
+`T_sp=310 K`, `L_sp=10 L`, and `Fin_sp=2/60 L/s`.
 
-- `fouling`
-- `pump_degrade`
-- `cool_stuck_closed`
+| Fault | Severity / trigger | Physical consequence | Recovery pressure |
+| --- | --- | --- | --- |
+| `fouling` | Heat-transfer coefficient `UA_eff` decays after about 2000 s. The configured maximum loss is 70%, with time constant `tau=2000 s`. | Cooling becomes progressively less effective, causing temperature rise and possible cooling-valve saturation. | Reduce process heat/load, typically by lowering `Fin_sp`, while keeping temperature near the safe target. |
+| `pump_degrade` | Outlet pump flow is multiplied by `0.5` after about 2000 s. | Outflow authority is halved, so reactor level can drift high and overflow protection may activate. | Adjust level and flow setpoints so level remains within safe bounds. |
+| `cool_stuck_closed` | Cooling valve command is forced to `0.3` after about 2000 s. | Cooling authority is capped even if the PID controller asks for more cooling. Temperature can exceed the safe band. | Reduce inlet/load because the cooling actuator cannot provide enough authority. |
+
+The code also contains definitions for additional CSTR faults
+(`cool_stuck_open`, `outlet_block`, `inlet_stuck_open`, `temp_bias`,
+`level_bias`, and `leak`), but the default `--fault all` ablation uses
+`fouling`, `pump_degrade`, and `cool_stuck_closed`.
+
+The CSTR agent action space is continuous but constrained. The LLM may propose
+only these supervisory setpoints:
+
+| Agent-controlled variable | Meaning | Default | Prompt constraint |
+| --- | --- | --- | --- |
+| `T_sp` | Temperature setpoint | `310.0 K` | Change in increments of `0.05`. |
+| `L_sp` | Level setpoint | `10.0 L` | Change in increments of `0.05`. |
+| `Fin_sp` | Inlet flow setpoint | `0.033333... L/s` | Change in increments of `0.005`. |
+
+The agent cannot directly set valve openings, pump speed, cooling flow, or PID
+gains. Those remain under the plant controllers. This matters because faults
+such as fouling and stuck cooling cannot be solved by simply commanding "more
+cooling"; the agent must find a feasible setpoint change that the lower-level
+controllers can actually track.
 
 The proposed setpoints are rolled out in the digital twin before being applied.
 The validator checks actuator validity, unsafe exposure, time to safe state,
