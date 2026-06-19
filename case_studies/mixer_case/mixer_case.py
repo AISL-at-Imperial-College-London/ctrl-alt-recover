@@ -14,7 +14,7 @@ import copy
 sys.stdout = open(sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1)
 load_dotenv()
 
-from mixer_module.simulation import Simulation
+from simulation import Simulation
 
 # =============================================================================
 # SPARQL/KG Integration via graph_retrieval.py
