@@ -23,6 +23,7 @@ case_studies/
   mixer_case/
     mixer_case.py                Discrete LLM supervisory loop
     graph_retrieval_code.py      SPARQL retrieval for mixer KG context
+    simulation.py                Mixing module simulation model
   cstr_case/
     cstr_case.py                 Continuous CSTR LLM recovery loop
     cstr_digital_twin.py         CSTR simulation model
