@@ -488,3 +488,16 @@ This repository is intended as an executable research artifact for investigating
 LLM-assisted supervisory recovery. When reporting results, include the model,
 prompt level or detector mode, fault set, number of runs, GraphDB configuration,
 and whether the run used OpenAI or Ollama-backed models.
+
+If you use this codebase or reference our work in your research, please cite it as follows:
+
+```bibtex
+@misc{vyas2026detectionactionusingllm,
+      title={From Detection to Action: Using LLM Agents for Fault-Tolerant Control}, 
+      author={Javal Vyas and Milapji Singh Gill and Artan Markaj and Felix Gehlhoff and Mehmet Mercangöz},
+      year={2026},
+      eprint={2606.28011},
+      archivePrefix={arXiv},
+      primaryClass={eess.SY},
+      url={https://arxiv.org/abs/2606.28011}, 
+}
