@@ -221,6 +221,8 @@ cd case_studies/mixer_case
 python mixer_case.py --fault pump_failure --runs 1 --model gpt-4o-mini --prompt-level normal
 python mixer_case.py --fault all --runs 3 --model gpt-4.1-mini --prompt-level minimal
 python mixer_case.py --fault leak --runs 10 --output ../../results
+# Explicit fault-free baseline; complete traces are written to ../../traces by default
+python mixer_case.py --fault normal --runs 1 --model gpt-4o-mini
 ```
 
 CSTR examples:
@@ -230,6 +232,8 @@ cd case_studies/cstr_case
 python cstr_case.py --fault fouling --runs 1 --llm-model gpt-4o-mini --mode 3sigma
 python cstr_case.py --fault all --runs 3 --llm-model gpt-4o-mini --output ../../results
 python cstr_case.py --fault cool_stuck_closed --runs 1 --plot
+# Explicit fault-free baseline; complete traces are written to ../../traces by default
+python cstr_case.py --fault normal --runs 1 --llm-model gpt-4o-mini --mode 3sigma
 ```
 
 For Ollama models, make sure the local server is running and pass the model name
@@ -240,6 +244,31 @@ filenames unless you also adjust the filename sanitisation.
 
 The project records decision traces so that an experiment can be inspected after
 the run instead of relying only on a success/failure label.
+
+Each new run also writes a self-contained reviewer trace under `traces/`. The
+directory contains the exact SPARQL query, returned Turtle subgraph, fully
+augmented system/user messages, raw and parsed model response, agent-provided
+rationale, validation decisions, and accepted trajectory CSVs. Files are grouped
+as follows:
+
+```text
+traces/<case-study>/<experiment>/<model>/<fault>/run_<number>/
+  metadata.json
+  events.jsonl
+  queries/*.sparql
+  subgraphs/*.ttl
+  prompts/*.json
+  responses/*.json
+  trajectories/*.csv
+  trajectories/*.metadata.json
+  final_result.json
+  manifest.json
+```
+
+Use `--trace-dir <path>` to select another location, or `--trace-dir ""` to
+disable complete tracing. See [`traces/README.md`](traces/README.md) for the
+artifact contract and reviewer hand-off checklist. The recorded rationale is the
+rationale explicitly returned by the agent; it is not hidden model chain-of-thought.
 
 ### Mixer Decision Trace
 
@@ -469,7 +498,8 @@ Expected structured response:
 
 ## Outputs
 
-Results are written under `results/` by default. Common output names include:
+Aggregate results are written under `results/` by default, while complete
+reviewer traces are written under `traces/`. Common result names include:
 
 ```text
 ablation_<model>_<prompt_level>_<timestamp>_runs.csv

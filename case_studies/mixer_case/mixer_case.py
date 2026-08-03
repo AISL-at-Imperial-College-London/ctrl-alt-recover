@@ -10,9 +10,16 @@ from textwrap import dedent
 import json
 import sys
 import copy
+from pathlib import Path
 
 sys.stdout = open(sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1)
 load_dotenv()
+
+CASE_STUDIES_ROOT = Path(__file__).resolve().parents[1]
+if str(CASE_STUDIES_ROOT) not in sys.path:
+    sys.path.insert(0, str(CASE_STUDIES_ROOT))
+
+from common.trace_logging import TraceRecorder
 
 from simulation import Simulation
 
@@ -21,17 +28,79 @@ from simulation import Simulation
 # =============================================================================
 
 try:
-    from graph_retrieval_code import run_construct, QUERY_PLANNING, QUERY_ACTION
+    from graph_retrieval_code import ENDPOINT, run_construct, QUERY_PLANNING, QUERY_ACTION
 
     SPARQL_AVAILABLE = True
 except ImportError:
     print("[WARNING] graph_retrieval.py not found - running without KG context")
     SPARQL_AVAILABLE = False
+    ENDPOINT = None
 
 # KG Context Cache (loaded once at startup)
 _KG_PLANNING_TTL: str = ""
 _KG_ACTION_TTL: str = ""
 _KG_LOADED: bool = False
+_TRACE_RECORDER: Optional[TraceRecorder] = None
+DEFAULT_TRACE_DIR = Path(__file__).resolve().parents[2] / "traces"
+
+
+def _record_cached_kg_trace(recorder: TraceRecorder) -> None:
+    """Attach the exact cached SPARQL inputs and returned subgraphs to a run."""
+    if not SPARQL_AVAILABLE:
+        recorder.record_event("sparql_unavailable")
+        return
+    recorder.record_sparql(
+        name="planning",
+        query=QUERY_PLANNING,
+        subgraph=_KG_PLANNING_TTL,
+        endpoint=ENDPOINT,
+        loaded=bool(_KG_PLANNING_TTL),
+    )
+    recorder.record_sparql(
+        name="action",
+        query=QUERY_ACTION,
+        subgraph=_KG_ACTION_TTL,
+        endpoint=ENDPOINT,
+        loaded=bool(_KG_ACTION_TTL),
+    )
+
+
+def _mixer_trajectory_rows(state: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Return the accepted plant history in a loop-analysis-friendly table."""
+    columns = {
+        "time": state.get("log_time", []),
+        "state": state.get("log_curr_state", []),
+        "tank_B201_state": state.get("log_tank_B201_state", []),
+        "tank_B202_state": state.get("log_tank_B202_state", []),
+        "tank_B203_state": state.get("log_tank_B203_state", []),
+        "tank_B204_state": state.get("log_tank_B204_state", []),
+        "level_B201": state.get("log_level_B201", []),
+        "level_B202": state.get("log_level_B202", []),
+        "level_B203": state.get("log_level_B203", []),
+        "level_B204": state.get("log_level_B204", []),
+        "valve_in_B201": state.get("log_valve_in_B201", []),
+        "valve_in_B202": state.get("log_valve_in_B202", []),
+        "valve_in_B203": state.get("log_valve_in_B203", []),
+        "valve_in_B204": state.get("log_valve_in_B204", []),
+        "valve_out_B201": state.get("log_valve_out_B201", []),
+        "valve_out_B202": state.get("log_valve_out_B202", []),
+        "valve_out_B203": state.get("log_valve_out_B203", []),
+        "valve_out_B204": state.get("log_valve_out_B204", []),
+        "pump_power": state.get("log_pump_power", []),
+        "pump_power_alt": state.get("log_pump_power_alt", []),
+    }
+    row_count = max((len(values) for values in columns.values()), default=0)
+    return [
+        {
+            "iteration": index + 1,
+            "fault_condition": state.get("condition", "normal"),
+            **{
+                key: values[index] if index < len(values) else None
+                for key, values in columns.items()
+            },
+        }
+        for index in range(row_count)
+    ]
 
 
 def load_kg_context() -> bool:
@@ -1718,6 +1787,25 @@ Return your decision as JSON with: current_state, next_state, reasoning
     state["m_llm_planning_calls"] += 1
     state["m_llm_planning_latency_s"] += dt
 
+    if _TRACE_RECORDER is not None:
+        _TRACE_RECORDER.record_llm_call(
+            agent="planning",
+            iteration=int(state.get("itr", 0)),
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": user_msg},
+            ],
+            raw_response=raw_response.get("raw"),
+            parsed_response=response,
+            rationale=getattr(response, "reasoning", None),
+            usage={
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": input_tokens + output_tokens,
+            },
+            latency_seconds=dt,
+        )
+
     print(f"[PLANNING] Tokens: {input_tokens} in, {output_tokens} out")
 
     # Validate the chosen state
@@ -1923,6 +2011,25 @@ Return JSON with: target_state, actions (list of actuator/value pairs), reasonin
     state["m_action_output_tokens"] += output_tokens
     state["m_llm_action_calls"] += 1
     state["m_llm_action_latency_s"] += dt
+
+    if _TRACE_RECORDER is not None:
+        _TRACE_RECORDER.record_llm_call(
+            agent="action",
+            iteration=int(state.get("itr", 0)),
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": user_msg},
+            ],
+            raw_response=raw_response.get("raw"),
+            parsed_response=response,
+            rationale=getattr(response, "reasoning", None),
+            usage={
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": input_tokens + output_tokens,
+            },
+            latency_seconds=dt,
+        )
 
     print(f"[ACTION] Tokens: {input_tokens} in, {output_tokens} out")
 
@@ -2214,6 +2321,20 @@ def evaluation(state: GraphState) -> GraphState:
             # Keep original error message (might be a planning issue)
 
         state["should_reprompt"] = True
+        if _TRACE_RECORDER is not None:
+            _TRACE_RECORDER.record_event(
+                "validation_decision",
+                iteration=int(state.get("itr", 0)),
+                accepted=False,
+                condition=(
+                    "nominal"
+                    if str(state.get("condition", "normal")) == "normal"
+                    else "fault"
+                ),
+                target_state=target_state,
+                fail_reason=state.get("simulation_error", "simulation_error"),
+                validated_state=twin,
+            )
         return state
 
     # =========================================================================
@@ -2483,6 +2604,23 @@ def evaluation(state: GraphState) -> GraphState:
 
         # Store in log (make a copy to avoid reference issues)
         state["log_iteration_details"].append(dict(itr_data))
+
+    if _TRACE_RECORDER is not None:
+        _TRACE_RECORDER.record_event(
+            "validation_decision",
+            iteration=int(state.get("itr", 0)),
+            accepted=not bool(state.get("should_reprompt", False)),
+            condition=(
+                "nominal"
+                if str(state.get("condition", "normal")) == "normal"
+                else "fault"
+            ),
+            target_state=target_state,
+            planning_check=planning_check,
+            actuator_check=actuator_check,
+            fail_reason=state.get("simulation_error", ""),
+            validated_state=state.get("digital_twin_states", {}),
+        )
 
     return state
 
@@ -2956,9 +3094,35 @@ def validate_sequence(actual_sequence: List[str], fault: str) -> dict:
 # =============================================================================
 
 
-def run_single_experiment(graph, fault: str, verbose: bool = True) -> dict:
+def run_single_experiment(
+    graph,
+    fault: str,
+    verbose: bool = True,
+    *,
+    run: int = 0,
+    trace_dir: Optional[str] = None,
+    experiment_id: Optional[str] = None,
+) -> dict:
     """Run a single experiment with given fault condition."""
-    global CURRENT_MODEL, CURRENT_PROMPT_LEVEL
+    global CURRENT_MODEL, CURRENT_PROMPT_LEVEL, _TRACE_RECORDER
+
+    recorder = None
+    if trace_dir:
+        recorder = TraceRecorder(
+            base_dir=trace_dir,
+            case_study="mixer",
+            model=CURRENT_MODEL,
+            fault=fault,
+            run=run,
+            experiment_id=experiment_id,
+            metadata={
+                "prompt_level": CURRENT_PROMPT_LEVEL,
+                "fault_source": "ground_truth_cli_argument",
+                "trajectory_condition": "nominal" if fault == "normal" else "fault",
+            },
+        )
+        _record_cached_kg_trace(recorder)
+    _TRACE_RECORDER = recorder
 
     if verbose:
         print("\n" + "=" * 60)
@@ -2972,7 +3136,16 @@ def run_single_experiment(graph, fault: str, verbose: bool = True) -> dict:
 
     # Measure wall time for the entire experiment
     start_time = time.perf_counter()
-    result = graph.invoke(input=inputs, config={"recursion_limit": 500})
+    try:
+        result = graph.invoke(input=inputs, config={"recursion_limit": 500})
+    except Exception as exc:
+        if recorder is not None:
+            recorder.finalize(
+                status="error",
+                result={"fault": fault, "run": run, "error": str(exc)},
+            )
+        _TRACE_RECORDER = None
+        raise
     wall_time = time.perf_counter() - start_time
 
     # Determine abort_reason from result (conditional edges don't persist state changes!)
@@ -3170,6 +3343,23 @@ def run_single_experiment(graph, fault: str, verbose: bool = True) -> dict:
         )
         print(f"  SUCCESS: {'✅ YES' if metrics['success'] else '❌ NO'}")
 
+    if recorder is not None:
+        condition = "nominal" if fault == "normal" else "fault"
+        if bool(metrics["success"]):
+            recorder.write_trajectory(
+                name=f"accepted_{condition}_plant",
+                rows=_mixer_trajectory_rows(result),
+                accepted=True,
+                condition=condition,
+                metadata={
+                    "fault": fault,
+                    "source": "executed_plant_history",
+                    "purpose": "sequence_and_loop_performance_analysis",
+                },
+            )
+        recorder.finalize(result=metrics)
+    _TRACE_RECORDER = None
+
     return metrics
 
 
@@ -3179,7 +3369,11 @@ def run_single_experiment(graph, fault: str, verbose: bool = True) -> dict:
 
 
 def run_ablation_study(
-    graph, faults: List[str], n_runs: int = 3, output_dir: str = "./results"
+    graph,
+    faults: List[str],
+    n_runs: int = 3,
+    output_dir: str = "./results",
+    trace_dir: Optional[str] = None,
 ) -> pd.DataFrame:
     """Run ablation study across multiple fault types and runs."""
     global CURRENT_MODEL, CURRENT_PROMPT_LEVEL
@@ -3212,7 +3406,14 @@ def run_ablation_study(
             print(f"\n--- Run {run + 1}/{n_runs} ---")
 
             try:
-                metrics = run_single_experiment(graph, fault, verbose=False)
+                metrics = run_single_experiment(
+                    graph,
+                    fault,
+                    verbose=False,
+                    run=run,
+                    trace_dir=trace_dir,
+                    experiment_id=f"mixer_{timestamp}",
+                )
                 metrics["run"] = run
 
                 all_results.append(metrics)
@@ -3634,6 +3835,12 @@ Examples:
         help="Output directory for results",
     )
     parser.add_argument(
+        "--trace-dir",
+        type=str,
+        default=str(DEFAULT_TRACE_DIR),
+        help="Directory for complete per-run traces; pass an empty string to disable",
+    )
+    parser.add_argument(
         "--model",
         "-m",
         type=str,
@@ -3686,16 +3893,28 @@ Examples:
         print("-" * 40)
         # Also save CSV for single default run
         df = run_ablation_study(
-            graph, faults=["pump_failure"], n_runs=1, output_dir=args.output
+            graph,
+            faults=["pump_failure"],
+            n_runs=1,
+            output_dir=args.output,
+            trace_dir=args.trace_dir or None,
         )
 
     elif args.fault == "all":
         df = run_ablation_study(
-            graph, faults=FAULT_TYPES, n_runs=args.runs, output_dir=args.output
+            graph,
+            faults=FAULT_TYPES,
+            n_runs=args.runs,
+            output_dir=args.output,
+            trace_dir=args.trace_dir or None,
         )
 
     else:
         # Always use run_ablation_study to get CSV output
         df = run_ablation_study(
-            graph, faults=[args.fault], n_runs=args.runs, output_dir=args.output
+            graph,
+            faults=[args.fault],
+            n_runs=args.runs,
+            output_dir=args.output,
+            trace_dir=args.trace_dir or None,
         )

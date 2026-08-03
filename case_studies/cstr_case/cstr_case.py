@@ -11,6 +11,7 @@ import copy
 import time
 from dataclasses import dataclass
 from collections import deque
+from pathlib import Path
 from typing import TypedDict, Dict, Any, List, Optional, Literal, Tuple
 
 import numpy as np
@@ -35,17 +36,38 @@ from dotenv import load_dotenv
 
 sys.stdout = open(sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1)
 load_dotenv()
+
+CASE_STUDIES_ROOT = Path(__file__).resolve().parents[1]
+if str(CASE_STUDIES_ROOT) not in sys.path:
+    sys.path.insert(0, str(CASE_STUDIES_ROOT))
+
+from common.trace_logging import TraceRecorder
+
 try:
-    from graph_retrieval_code import run_construct, QUERY_CSTR
+    from graph_retrieval_code import ENDPOINT, QUERY_CSTR, run_construct
 
     SPARQL_AVAILABLE = True
 except ImportError:
     print("[WARNING] graph_retrieval.py not found - running without KG context")
+    ENDPOINT = None
     SPARQL_AVAILABLE = False
 
 _KG_PLANNING_TTL: str = ""
 _KG_ACTION_TTL: str = ""
 _KG_LOADED: bool = False
+_TRACE_RECORDER: Optional[TraceRecorder] = None
+DEFAULT_TRACE_DIR = Path(__file__).resolve().parents[2] / "traces"
+
+
+def _record_cached_kg_trace(recorder: TraceRecorder) -> None:
+    """Persist the exact CSTR query and retrieved subgraph used in prompts."""
+    recorder.record_sparql(
+        name="action_context",
+        query=QUERY_CSTR if SPARQL_AVAILABLE else "",
+        subgraph=_KG_ACTION_TTL,
+        endpoint=ENDPOINT,
+        loaded=_KG_LOADED,
+    )
 
 
 def load_kg_context() -> bool:
@@ -1253,7 +1275,10 @@ def action_propose(state: GraphState) -> GraphState:
         except Exception:
             raise RuntimeError(f"LLM output parse failed. Original error: {e}")
 
-    plan = raw["parsed"]
+    if isinstance(raw, dict) and raw.get("parsed") is not None:
+        plan = raw["parsed"]
+    if plan is None:
+        raise RuntimeError("LLM output did not contain a parsed setpoint plan")
     latency_s = time.perf_counter() - t_start
 
     # ----- update state counters (no logic change) -----
@@ -1280,6 +1305,25 @@ def action_propose(state: GraphState) -> GraphState:
     state["action_total_tokens_sum"] = int(
         state.get("action_total_tokens_sum", 0)
     ) + int(total_tokens)
+
+    if _TRACE_RECORDER is not None:
+        _TRACE_RECORDER.record_llm_call(
+            agent="action",
+            iteration=int(state["action_calls"]),
+            messages=[
+                {"role": "system", "content": ACTION_SYSTEM_PROMPT_KG},
+                {"role": "user", "content": user_prompt},
+            ],
+            raw_response=raw.get("raw") if isinstance(raw, dict) else raw,
+            parsed_response=plan,
+            rationale=getattr(plan, "reasoning", ""),
+            usage={
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": total_tokens,
+            },
+            latency_seconds=latency_s,
+        )
 
     proposed = {
         "T_sp": float(plan.T_sp),
@@ -1385,7 +1429,7 @@ def rollout_validate_setpoints(
     deadline_s: float = 600.0,  # must reach safe within this time
     unsafe_fraction_max: float = 0.20,  # optional cap
     enforce_only_normal_phase: bool = True,  # ignore shutdown for safety judgement
-) -> Tuple[bool, str, str, Dict[str, Any]]:
+) -> Tuple[bool, str, str, Dict[str, Any], List[Dict[str, Any]]]:
     """
     Recovery-based rollout validation.
 
@@ -1395,7 +1439,7 @@ def rollout_validate_setpoints(
       - remains SAFE for safe_persist_s consecutively
       - unsafe_fraction <= unsafe_fraction_max  (optional)
 
-    Returns: ok, summary, fail_reason, metrics
+    Returns: ok, summary, fail_reason, metrics, trajectory
     """
     twin = clone_plant_obj(base_plant)
 
@@ -1426,13 +1470,11 @@ def rollout_validate_setpoints(
     L_sp_new = float(proposed["L_sp"])
     Fin_sp_new = float(proposed["Fin_sp"])
 
-    # end time is the experiment end (you want 7000s)
-    T_end = float(state.get("t_end", 8000.0))
+    # Validate through the same configured end time as the real trajectory.
+    T_end = float(state.get("T_end", 8000.0))
     out0 = state.get("sim_last", {})
     t0 = float(out0.get("t", 0.0)) if np.isfinite(float(out0.get("t", 0.0))) else 0.0
-
     dt = float(getattr(twin, "dt", 1.0))
-    n_steps = int(max(0, np.ceil((T_end - t0) / max(dt, 1e-9))))
 
     # tracking
     unsafe_time = 0.0
@@ -1451,11 +1493,9 @@ def rollout_validate_setpoints(
     peak_u_pump = -np.inf
 
     mode = str(state.get("mode", "RUN"))
+    trajectory: List[Dict[str, Any]] = []
 
-    T_end = 7000  # <-- correct key
-
-    dt = float(getattr(twin, "dt", 1.0))
-    n_steps = int(max(0, np.ceil((T_end - t0) / max(dt, 1e-9))))  # <-- no hardcoding
+    n_steps = int(max(0, np.ceil((T_end - t0) / max(dt, 1e-9))))
     for i in range(n_steps):
         out = twin.simulate_step(
             T_sp=T_sp_new,
@@ -1501,6 +1541,21 @@ def rollout_validate_setpoints(
             F_over=F_over,
         )
         c = control_checker.update(out=out, T_sp=T_sp_new)
+
+        trajectory.append(
+            {
+                "rollout_step": i,
+                **dict(out),
+                "proposed_T_sp": T_sp_new,
+                "proposed_L_sp": L_sp_new,
+                "proposed_Fin_sp": Fin_sp_new,
+                "safe_now": bool(s.get("safe_now", False)),
+                "recovered_now": bool(s.get("recovered", False)),
+                "control_zone": c.get("control_zone", ""),
+                "control_reasons": c.get("control_reasons", ""),
+                "actuator_valid": bool(c.get("actuator_valid", True)),
+            }
+        )
 
         zone = str(c.get("control_zone", "SAFE"))
         if zone == "UNSAFE":
@@ -1559,6 +1614,7 @@ def rollout_validate_setpoints(
             "FAIL: invalid actuators",
             first_fail_reason or "invalid_actuators",
             metrics,
+            trajectory,
         )
 
     if time_to_safe is None:
@@ -1567,6 +1623,7 @@ def rollout_validate_setpoints(
             f"FAIL: did not reach SAFE (persist {safe_persist_s}s)",
             "no_recovery",
             metrics,
+            trajectory,
         )
 
     if time_to_safe > deadline_s:
@@ -1575,6 +1632,7 @@ def rollout_validate_setpoints(
             f"FAIL: recovery too slow (time_to_safe={time_to_safe:.1f}s)",
             "slow_recovery",
             metrics,
+            trajectory,
         )
 
     if unsafe_fraction > unsafe_fraction_max:
@@ -1583,6 +1641,7 @@ def rollout_validate_setpoints(
             f"FAIL: unsafe_fraction too high ({unsafe_fraction:.3f})",
             "unsafe_fraction",
             metrics,
+            trajectory,
         )
 
     return (
@@ -1590,6 +1649,7 @@ def rollout_validate_setpoints(
         f"PASS: time_to_safe={time_to_safe:.1f}s, unsafe_fraction={unsafe_fraction:.3f}",
         "",
         metrics,
+        trajectory,
     )
 
 
@@ -1608,7 +1668,7 @@ def evaluation(state: GraphState) -> GraphState:
         state["eval_metrics"] = {}
         return state
 
-    ok, summary, fail_reason, metrics = rollout_validate_setpoints(
+    ok, summary, fail_reason, metrics, trajectory = rollout_validate_setpoints(
         base_plant=plant_obj,
         state=state,
         proposed=proposed,
@@ -1623,6 +1683,34 @@ def evaluation(state: GraphState) -> GraphState:
     state["eval_summary"] = summary
     state["eval_fail_reason"] = fail_reason
     state["eval_metrics"] = metrics
+
+    if _TRACE_RECORDER is not None:
+        condition = (
+            "nominal" if str(state.get("fault_name", "normal")) == "normal" else "fault"
+        )
+        _TRACE_RECORDER.record_event(
+            "validation_decision",
+            action_call=int(state.get("action_calls", 0)),
+            accepted=bool(ok),
+            condition=condition,
+            proposed_setpoints=proposed,
+            summary=summary,
+            fail_reason=fail_reason,
+            metrics=metrics,
+        )
+        if ok:
+            _TRACE_RECORDER.write_trajectory(
+                name=f"accepted_{condition}_validation_action_{int(state.get('action_calls', 0)):04d}",
+                rows=trajectory,
+                accepted=True,
+                condition=condition,
+                metadata={
+                    "source": "digital_twin_validation",
+                    "action_call": int(state.get("action_calls", 0)),
+                    "proposed_setpoints": proposed,
+                    "validation_metrics": metrics,
+                },
+            )
 
     print(f"[EVAL] {summary}")
     if not ok:
@@ -2057,9 +2145,12 @@ def run_single_experiment_cstr(
     fault: str,
     run: int,
     args: argparse.Namespace,
+    experiment_id: Optional[str] = None,
     recursion_limit: int = 200000,
     verbose: bool = True,
 ) -> Dict[str, Any]:
+    global _TRACE_RECORDER
+
     init_state: GraphState = {
         "fault_name": fault,
         "detector_mode": args.mode,
@@ -2080,8 +2171,42 @@ def run_single_experiment_cstr(
     if verbose:
         print(f"\n--- Run {run+1} fault={fault} ---")
 
+    trace_dir = getattr(args, "trace_dir", None)
+    recorder = None
+    if trace_dir:
+        recorder = TraceRecorder(
+            base_dir=trace_dir,
+            case_study="cstr",
+            model=str(args.llm_model),
+            fault=fault,
+            run=run,
+            experiment_id=experiment_id,
+            metadata={
+                "detector_mode": args.mode,
+                "fault_source": "configured_simulation_scenario",
+                "trajectory_condition": "nominal" if fault == "normal" else "fault",
+                "configured_setpoints": {
+                    "T_sp": args.T_sp,
+                    "L_sp": args.L_sp,
+                    "Fin_sp": args.Fin_sp,
+                },
+                "T_end": args.T_end,
+            },
+        )
+        _TRACE_RECORDER = recorder
+        _record_cached_kg_trace(recorder)
+
     t0 = time.perf_counter()
-    out = graph.invoke(init_state, config={"recursion_limit": recursion_limit})
+    try:
+        out = graph.invoke(init_state, config={"recursion_limit": recursion_limit})
+    except Exception as exc:
+        if recorder is not None:
+            recorder.finalize(
+                status="error",
+                result={"error_type": type(exc).__name__, "error": str(exc)},
+            )
+        _TRACE_RECORDER = None
+        raise
     wall = time.perf_counter() - t0
 
     metrics = _extract_cstr_metrics(
@@ -2107,6 +2232,49 @@ def run_single_experiment_cstr(
         "final_fault_flag": bool(out.get("fault_flag", False)),
         "final_violated_params": out.get("violated_params", ""),
     }
+
+    if recorder is not None:
+        condition = "nominal" if fault == "normal" else "fault"
+        completed_safe = (
+            bool(metrics.get("reached_end"))
+            and bool(metrics.get("final_safe_now"))
+            and str(metrics.get("final_control_zone", "")) != "UNSAFE"
+        )
+        accepted = completed_safe and (
+            condition == "nominal" or bool(metrics.get("success"))
+        )
+        recorder.record_event(
+            "plant_trajectory_decision",
+            accepted=accepted,
+            condition=condition,
+            success=bool(metrics.get("success")),
+            reached_end=bool(metrics.get("reached_end")),
+            final_safe_now=bool(metrics.get("final_safe_now")),
+            final_control_zone=metrics.get("final_control_zone", ""),
+        )
+        if accepted:
+            recorder.write_trajectory(
+                name=f"accepted_{condition}_plant",
+                rows=out.get("sim_log", []),
+                accepted=True,
+                condition=condition,
+                metadata={
+                    "source": "executed_plant_simulation",
+                    "fault": fault,
+                    "success": bool(metrics.get("success")),
+                    "reached_end": bool(metrics.get("reached_end")),
+                    "final_safe_now": bool(metrics.get("final_safe_now")),
+                    "final_control_zone": metrics.get("final_control_zone", ""),
+                    "acceptance_rule": (
+                        "reached_end and final_safe_now and final_control_zone != UNSAFE; "
+                        "fault runs also require success"
+                    ),
+                },
+            )
+        recorder.finalize(
+            result={k: v for k, v in metrics.items() if k != "_analysis"}
+        )
+        _TRACE_RECORDER = None
 
     return metrics, out
 
@@ -2148,6 +2316,7 @@ def run_ablation_study_cstr(
                     fault=fault,
                     run=run,
                     args=args,
+                    experiment_id=f"cstr_{timestamp}",
                     verbose=True,
                 )
                 all_metrics.append(
@@ -2347,6 +2516,7 @@ def main():
         default="fouling",
         choices=[
             "all",
+            "normal",
             "fouling",
             "pump_degrade",
             "cool_stuck_closed",
@@ -2360,6 +2530,12 @@ def main():
         type=str,
         default="./results",
         help="Output directory for CSV/JSON analysis",
+    )
+    parser.add_argument(
+        "--trace-dir",
+        type=str,
+        default=str(DEFAULT_TRACE_DIR),
+        help="Directory for reviewer-ready traces; pass an empty string to disable",
     )
 
     parser.add_argument(
