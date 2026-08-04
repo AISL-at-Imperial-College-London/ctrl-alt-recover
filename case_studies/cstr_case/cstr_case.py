@@ -70,6 +70,28 @@ def _record_cached_kg_trace(recorder: TraceRecorder) -> None:
     )
 
 
+def _append_live_plant_state(state: GraphState) -> None:
+    """Publish the latest monitored plant row for the live CSTR dashboard."""
+    if _TRACE_RECORDER is None or not state.get("sim_log"):
+        return
+
+    row = state["sim_log"][-1]
+    row.update(
+        {
+            "iteration": int(state.get("itr", 0)),
+            "safe_now": bool(state.get("safe_now", False)),
+            "recovered_now": bool(state.get("recovered_now", False)),
+            "fault_flag": bool(state.get("fault_flag", False)),
+            "anomaly_ratio": float(state.get("anomaly_ratio", 0.0)),
+            "violated_params": state.get("violated_params", ""),
+            "control_zone": state.get("control_zone", ""),
+            "control_reasons": state.get("control_reasons", ""),
+            "actuator_valid": bool(state.get("actuator_valid", True)),
+        }
+    )
+    _TRACE_RECORDER.append_live_row(stream_name="cstr_plant", row=row)
+
+
 def load_kg_context() -> bool:
     """Load KG context from GraphDB (called once at startup)."""
     global _KG_PLANNING_TTL, _KG_ACTION_TTL, _KG_LOADED
@@ -1022,6 +1044,7 @@ def monitoring(state: GraphState) -> GraphState:
                 f"safe={state['safe_now']} recovered={state['recovered_now']} "
                 f"zone={state['control_zone']} {state.get('control_reasons','')}"
             )
+        _append_live_plant_state(state)
         return state
 
     # =============================================================================
@@ -1134,6 +1157,7 @@ def monitoring(state: GraphState) -> GraphState:
             f"violations={state.get('violated_params','')}"
         )
 
+    _append_live_plant_state(state)
     return state
 
 
@@ -1542,20 +1566,24 @@ def rollout_validate_setpoints(
         )
         c = control_checker.update(out=out, T_sp=T_sp_new)
 
-        trajectory.append(
-            {
-                "rollout_step": i,
-                **dict(out),
-                "proposed_T_sp": T_sp_new,
-                "proposed_L_sp": L_sp_new,
-                "proposed_Fin_sp": Fin_sp_new,
-                "safe_now": bool(s.get("safe_now", False)),
-                "recovered_now": bool(s.get("recovered", False)),
-                "control_zone": c.get("control_zone", ""),
-                "control_reasons": c.get("control_reasons", ""),
-                "actuator_valid": bool(c.get("actuator_valid", True)),
-            }
-        )
+        trajectory_row = {
+            "rollout_step": i,
+            "action_call": int(state.get("action_calls", 0)),
+            **dict(out),
+            "proposed_T_sp": T_sp_new,
+            "proposed_L_sp": L_sp_new,
+            "proposed_Fin_sp": Fin_sp_new,
+            "safe_now": bool(s.get("safe_now", False)),
+            "recovered_now": bool(s.get("recovered", False)),
+            "control_zone": c.get("control_zone", ""),
+            "control_reasons": c.get("control_reasons", ""),
+            "actuator_valid": bool(c.get("actuator_valid", True)),
+        }
+        trajectory.append(trajectory_row)
+        if _TRACE_RECORDER is not None:
+            _TRACE_RECORDER.append_live_row(
+                stream_name="cstr_validation", row=trajectory_row
+            )
 
         zone = str(c.get("control_zone", "SAFE"))
         if zone == "UNSAFE":

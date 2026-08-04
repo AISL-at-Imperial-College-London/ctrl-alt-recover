@@ -11,7 +11,7 @@ import re
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Optional, Sequence
+from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, TextIO
 
 
 def _utc_now() -> str:
@@ -99,13 +99,22 @@ class TraceRecorder:
             / _safe_name(fault)
             / f"run_{int(run):03d}"
         )
-        for child in ("queries", "subgraphs", "prompts", "responses", "trajectories"):
+        for child in (
+            "queries",
+            "subgraphs",
+            "prompts",
+            "responses",
+            "trajectories",
+            "live",
+        ):
             (self.run_dir / child).mkdir(parents=True, exist_ok=True)
 
         self.events_path = self.run_dir / "events.jsonl"
         self._sequence = 0
         self._llm_call = 0
         self._artifacts: list[Dict[str, Any]] = []
+        self._live_paths: set[Path] = set()
+        self._live_streams: Dict[Path, TextIO] = {}
         self.metadata: Dict[str, Any] = {
             "trace_version": self.TRACE_VERSION,
             "case_study": case_study,
@@ -150,6 +159,29 @@ class TraceRecorder:
         }
         with self.events_path.open("a", encoding="utf-8", newline="\n") as stream:
             stream.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    def append_live_row(self, *, stream_name: str, row: Mapping[str, Any]) -> Path:
+        """Append one immediately visible JSONL row for live dashboards."""
+        path = self.run_dir / "live" / f"{_safe_name(stream_name)}.jsonl"
+        if path not in self._live_paths:
+            self._live_paths.add(path)
+            self._live_streams[path] = path.open(
+                "w", encoding="utf-8", newline="\n", buffering=1
+            )
+            self.record_event(
+                "live_stream_started",
+                stream=stream_name,
+                path=path.relative_to(self.run_dir).as_posix(),
+            )
+
+        record = {
+            "written_at_utc": _utc_now(),
+            **_jsonable(dict(row)),
+        }
+        output = self._live_streams[path]
+        output.write(json.dumps(record, ensure_ascii=False) + "\n")
+        output.flush()
+        return path
 
     def record_sparql(
         self,
@@ -281,6 +313,11 @@ class TraceRecorder:
             "result": _jsonable(result),
         }
         self._write_json("final_result.json", final)
+        for stream in self._live_streams.values():
+            stream.close()
+        for live_path in sorted(self._live_paths):
+            if live_path.exists():
+                self._artifact_record(live_path, live_path.read_bytes())
         events_content = self.events_path.read_bytes()
         self._artifact_record(self.events_path, events_content)
         manifest = {

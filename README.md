@@ -236,6 +236,20 @@ python cstr_case.py --fault cool_stuck_closed --runs 1 --plot
 python cstr_case.py --fault normal --runs 1 --llm-model gpt-4o-mini --mode 3sigma
 ```
 
+To watch a CSTR run evolve, start the read-only dashboard in one terminal before
+starting the experiment in another:
+
+```bash
+cd case_studies/cstr_case
+python live_trace_viewer.py
+```
+
+The dashboard automatically follows the newest CSTR trace and displays measured
+and true temperature, temperature setpoint, level, flows, actuator commands,
+safety zones, the latest validation rollout, and trace read/write activity. Use
+`--run-dir <trace-run-directory>` to pin the viewer to one run or `--window 3000`
+to display a longer history.
+
 For Ollama models, make sure the local server is running and pass the model name
 with the relevant argument. Avoid model names containing `:` when creating CSV
 filenames unless you also adjust the filename sanitisation.

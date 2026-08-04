@@ -47,6 +47,17 @@ python cstr_case.py --fault normal --runs 1 --llm-model gpt-4o-mini --mode 3sigm
 python cstr_case.py --fault all --runs 1 --llm-model gpt-4o-mini --mode 3sigma
 ```
 
+For a live view, start this in a separate terminal before the CSTR command:
+
+```bash
+python live_trace_viewer.py
+```
+
+It follows the newest run automatically. The executed plant stream is written to
+`live/cstr_plant.jsonl`; candidate digital-twin rollouts are written separately
+to `live/cstr_validation.jsonl`. Both are append-only while the run is active and
+are included in the final SHA-256 manifest.
+
 For final paper artifacts, use the same model, prompt level or detector mode,
 fault set, random-seed policy, and number of repetitions reported in the paper.
 Keep successful and failed run directories so selection is auditable; accepted
