@@ -1,0 +1,10 @@
+fault,run,llm_model,detector_mode,success,reached_end,abort_reason,eval_pass,wall_time_s,sim_time_s,steps,final_control_zone,final_safe_now,reprompts,unsafe_seconds,warning_seconds,safe_seconds,error
+fouling,0,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+fouling,1,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+fouling,2,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+pump_degrade,0,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+pump_degrade,1,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+pump_degrade,2,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+cool_stuck_closed,0,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+cool_stuck_closed,1,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value
+cool_stuck_closed,2,gpt-4o-mini,3sigma,0,0,exception,0,0.0,,0,,0,0,,,,cannot access local variable 'dt' where it is not associated with a value

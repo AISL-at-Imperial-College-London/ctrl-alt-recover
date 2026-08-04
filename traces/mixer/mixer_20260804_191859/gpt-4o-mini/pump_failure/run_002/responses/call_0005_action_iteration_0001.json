@@ -1,0 +1,109 @@
+{
+  "agent": "action",
+  "iteration": 1,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_PD4cZDKksiZ6UZn1RoeM9aJB",
+          "function": {
+            "arguments": "{\"target_state\":\"state_filling_tank_B201\",\"actions\":[{\"actuator\":\"valve_pump_tank_B201\",\"value\":1},{\"actuator\":\"valve_pump_tank_B204\",\"value\":1},{\"actuator\":\"pump_P101\",\"value\":1}],\"reasoning\":\"The state 'state_filling_tank_B201' requires the opening of the outlet valve for tank B201 and tank B204, as well as the activation of pump P101 to fill tank B201. This is based on the UML:doAction linked to the state, which specifies the necessary actuators.\"}",
+            "name": "ActionPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 126,
+        "prompt_tokens": 3292,
+        "total_tokens": 3418,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 3200
+        }
+      },
+      "model_name": "gpt-4o-mini-2024-07-18",
+      "system_fingerprint": "fp_0950b7f384",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--f5342dac-8215-4132-a467-584b8521e58a-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "ActionPlan",
+        "args": {
+          "target_state": "state_filling_tank_B201",
+          "actions": [
+            {
+              "actuator": "valve_pump_tank_B201",
+              "value": 1
+            },
+            {
+              "actuator": "valve_pump_tank_B204",
+              "value": 1
+            },
+            {
+              "actuator": "pump_P101",
+              "value": 1
+            }
+          ],
+          "reasoning": "The state 'state_filling_tank_B201' requires the opening of the outlet valve for tank B201 and tank B204, as well as the activation of pump P101 to fill tank B201. This is based on the UML:doAction linked to the state, which specifies the necessary actuators."
+        },
+        "id": "call_PD4cZDKksiZ6UZn1RoeM9aJB",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 3292,
+      "output_tokens": 126,
+      "total_tokens": 3418,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 3200
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "target_state": "state_filling_tank_B201",
+    "actions": [
+      {
+        "actuator": "valve_pump_tank_B201",
+        "value": 1.0
+      },
+      {
+        "actuator": "valve_pump_tank_B204",
+        "value": 1.0
+      },
+      {
+        "actuator": "pump_P101",
+        "value": 1.0
+      }
+    ],
+    "reasoning": "The state 'state_filling_tank_B201' requires the opening of the outlet valve for tank B201 and tank B204, as well as the activation of pump P101 to fill tank B201. This is based on the UML:doAction linked to the state, which specifies the necessary actuators."
+  },
+  "agent_provided_rationale": "The state 'state_filling_tank_B201' requires the opening of the outlet valve for tank B201 and tank B204, as well as the activation of pump P101 to fill tank B201. This is based on the UML:doAction linked to the state, which specifies the necessary actuators.",
+  "usage": {
+    "input_tokens": 3292,
+    "output_tokens": 126,
+    "total_tokens": 3418
+  },
+  "latency_seconds": 1.7409247999894433
+}

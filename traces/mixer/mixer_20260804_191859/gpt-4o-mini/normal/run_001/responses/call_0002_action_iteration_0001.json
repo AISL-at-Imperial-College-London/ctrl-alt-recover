@@ -1,0 +1,109 @@
+{
+  "agent": "action",
+  "iteration": 1,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_KJMHmpsQuH6xuWWP8gtcH1c5",
+          "function": {
+            "arguments": "{\"target_state\":\"state_filling_tank_B201\",\"actions\":[{\"actuator\":\"valve_in_B201\",\"value\":1},{\"actuator\":\"valve_pump_tank_B204\",\"value\":1},{\"actuator\":\"pump_P101\",\"value\":1}],\"reasoning\":\"In the state 'state_filling_tank_B201', the actions linked to this state require the opening of the inlet valve (valve_pump_tank_B201) and the operation of the pump (pump_P101) to fill the tank. The outlet valve (valve_pump_tank_B204) is also activated to allow for proper filling.\"}",
+            "name": "ActionPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 133,
+        "prompt_tokens": 3158,
+        "total_tokens": 3291,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 3072
+        }
+      },
+      "model_name": "gpt-4o-mini-2024-07-18",
+      "system_fingerprint": "fp_0950b7f384",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--7507cec0-2197-4b0f-8b0f-28fcc199a4fe-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "ActionPlan",
+        "args": {
+          "target_state": "state_filling_tank_B201",
+          "actions": [
+            {
+              "actuator": "valve_in_B201",
+              "value": 1
+            },
+            {
+              "actuator": "valve_pump_tank_B204",
+              "value": 1
+            },
+            {
+              "actuator": "pump_P101",
+              "value": 1
+            }
+          ],
+          "reasoning": "In the state 'state_filling_tank_B201', the actions linked to this state require the opening of the inlet valve (valve_pump_tank_B201) and the operation of the pump (pump_P101) to fill the tank. The outlet valve (valve_pump_tank_B204) is also activated to allow for proper filling."
+        },
+        "id": "call_KJMHmpsQuH6xuWWP8gtcH1c5",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 3158,
+      "output_tokens": 133,
+      "total_tokens": 3291,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 3072
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "target_state": "state_filling_tank_B201",
+    "actions": [
+      {
+        "actuator": "valve_in_B201",
+        "value": 1.0
+      },
+      {
+        "actuator": "valve_pump_tank_B204",
+        "value": 1.0
+      },
+      {
+        "actuator": "pump_P101",
+        "value": 1.0
+      }
+    ],
+    "reasoning": "In the state 'state_filling_tank_B201', the actions linked to this state require the opening of the inlet valve (valve_pump_tank_B201) and the operation of the pump (pump_P101) to fill the tank. The outlet valve (valve_pump_tank_B204) is also activated to allow for proper filling."
+  },
+  "agent_provided_rationale": "In the state 'state_filling_tank_B201', the actions linked to this state require the opening of the inlet valve (valve_pump_tank_B201) and the operation of the pump (pump_P101) to fill the tank. The outlet valve (valve_pump_tank_B204) is also activated to allow for proper filling.",
+  "usage": {
+    "input_tokens": 3158,
+    "output_tokens": 133,
+    "total_tokens": 3291
+  },
+  "latency_seconds": 10.584595800028183
+}

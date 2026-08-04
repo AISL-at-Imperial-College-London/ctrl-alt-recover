@@ -1,0 +1,9 @@
+iteration,fault_condition,time,state,tank_B201_state,tank_B202_state,tank_B203_state,tank_B204_state,level_B201,level_B202,level_B203,level_B204,valve_in_B201,valve_in_B202,valve_in_B203,valve_in_B204,valve_out_B201,valve_out_B202,valve_out_B203,valve_out_B204,pump_power,pump_power_alt
+1,pump_failure,0,state_initialStep,Empty,Empty,Empty,Empty,0.022,0.022,0.022,0.022,0,0,0,0,0,0,0,0,0,0
+2,pump_failure,0.1,state_filling_tank_B201,Empty,Empty,Empty,Empty,0.03462698082824364,0.022,0.022,0.022,1,0,0,0,0,0,0,0,0.0,0.0
+3,pump_failure,0.2,state_filling_tank_B202,Empty,Empty,Empty,Empty,0.03462698082824364,0.03414613820268211,0.022,0.022,0,1,0,0,0,0,0,0,0.0,0.0
+4,pump_failure,0.30000000000000004,state_filling_tank_B203,Empty,Empty,Empty,Empty,0.03462698082824364,0.03414613820268211,0.034671070930897226,0.022,0,0,1,0,0,0,0,0,0.0,0.0
+5,pump_failure,0.30000000000000004,state_bypass_emptying_tank_b201,Empty,Empty,Empty,Empty,0.021132584274107143,0.03414613820268211,0.034671070930897226,0.0354943965541365,0,0,0,1,1,0,0,0,0.0,1.0
+6,pump_failure,0.30000000000000004,state_bypass_emptying_tank_b202,Empty,Empty,Empty,Empty,0.021132584274107143,0.020593186742693205,0.034671070930897226,0.04904734801412537,0,0,0,1,0,1,0,0,0.0,1.0
+7,pump_failure,0.30000000000000004,state_bypass_emptying_tank_b203,Empty,Empty,Empty,Empty,0.021132584274107143,0.020593186742693205,0.02131341749596555,0.06240500144905702,0,0,0,1,0,0,1,0,0.0,1.0
+8,pump_failure,0.30000000000000004,state_emptying_tank_B204,Empty,Empty,Empty,Empty,0.021132584274107143,0.020593186742693205,0.02131341749596555,0.02124013330534329,0,0,0,0,0,0,0,1,0.0,0.0

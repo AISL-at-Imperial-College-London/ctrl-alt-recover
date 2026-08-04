@@ -1,0 +1,13 @@
+{
+  "trace_version": "1.0",
+  "case_study": "mixer",
+  "model": "gpt-4.1-mini",
+  "fault": "pump_degradation",
+  "run": 0,
+  "experiment_id": "mixer_20260804_184352",
+  "repository_commit": "07c8bf5997db44b9ab5927c006e3ea02b944061c",
+  "started_at_utc": "2026-08-04T17:49:37.752298Z",
+  "prompt_level": "normal",
+  "fault_source": "ground_truth_cli_argument",
+  "trajectory_condition": "fault"
+}

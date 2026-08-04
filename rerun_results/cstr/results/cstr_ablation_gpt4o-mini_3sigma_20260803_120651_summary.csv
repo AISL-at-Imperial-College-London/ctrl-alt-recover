@@ -1,0 +1,4 @@
+fault,n,success_mean,success_std,reached_end_mean,eval_pass_mean,reprompts_mean,unsafe_seconds_mean,wall_time_mean,wall_time_std
+fouling,3,0.0,0.0,0.0,0.0,0.0,,0.0,0.0
+pump_degrade,3,0.0,0.0,0.0,0.0,0.0,,0.0,0.0
+cool_stuck_closed,3,0.0,0.0,0.0,0.0,0.0,,0.0,0.0

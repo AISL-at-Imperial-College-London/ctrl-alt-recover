@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "timestamp": "20260803_120651",
+    "llm_model": "gpt-4o-mini",
+    "detector_mode": "3sigma",
+    "runs_per_fault": 3,
+    "faults": [
+      "fouling",
+      "pump_degrade",
+      "cool_stuck_closed"
+    ],
+    "args": {
+      "fault": "all",
+      "runs": 3,
+      "output": "./results",
+      "trace_dir": "C:\\Users\\jv624\\Desktop\\ctrl-alt-recover\\traces",
+      "mode": "3sigma",
+      "max_steps": 20000,
+      "T_sp": 310.0,
+      "L_sp": 10.0,
+      "Fin_sp": 0.03333333333333333,
+      "T_end": 8000.0,
+      "safe_hold": 60.0,
+      "max_time_to_safe": -1.0,
+      "llm_model": "gpt-4o-mini",
+      "reprompt_max": 5,
+      "plot": false
+    }
+  },
+  "per_fault_summary": [
+    {
+      "fault": "fouling",
+      "n": 3,
+      "success_mean": 0.0,
+      "success_std": 0.0,
+      "reached_end_mean": 0.0,
+      "eval_pass_mean": 0.0,
+      "reprompts_mean": 0.0,
+      "unsafe_seconds_mean": NaN,
+      "wall_time_mean": 0.0,
+      "wall_time_std": 0.0
+    },
+    {
+      "fault": "pump_degrade",
+      "n": 3,
+      "success_mean": 0.0,
+      "success_std": 0.0,
+      "reached_end_mean": 0.0,
+      "eval_pass_mean": 0.0,
+      "reprompts_mean": 0.0,
+      "unsafe_seconds_mean": NaN,
+      "wall_time_mean": 0.0,
+      "wall_time_std": 0.0
+    },
+    {
+      "fault": "cool_stuck_closed",
+      "n": 3,
+      "success_mean": 0.0,
+      "success_std": 0.0,
+      "reached_end_mean": 0.0,
+      "eval_pass_mean": 0.0,
+      "reprompts_mean": 0.0,
+      "unsafe_seconds_mean": NaN,
+      "wall_time_mean": 0.0,
+      "wall_time_std": 0.0
+    }
+  ],
+  "runs": [
+    {
+      "fault": "fouling",
+      "run": 0,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "fouling",
+      "run": 1,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "fouling",
+      "run": 2,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "pump_degrade",
+      "run": 0,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "pump_degrade",
+      "run": 1,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "pump_degrade",
+      "run": 2,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "cool_stuck_closed",
+      "run": 0,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "cool_stuck_closed",
+      "run": 1,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    },
+    {
+      "fault": "cool_stuck_closed",
+      "run": 2,
+      "llm_model": "gpt-4o-mini",
+      "mode": "3sigma",
+      "error": "cannot access local variable 'dt' where it is not associated with a value"
+    }
+  ]
+}

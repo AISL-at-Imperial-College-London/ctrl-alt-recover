@@ -1,0 +1,83 @@
+{
+  "agent": "planning",
+  "iteration": 1,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_m0Qrf4AskswzuCQFqwRh2btO",
+          "function": {
+            "arguments": "{\"current_state\":\"state_initialStep\",\"next_state\":\"state_filling_tank_B201\",\"reasoning\":\"The system is in the initialization phase. The transition to state_filling_tank_B201 is always taken at process start, independent of system conditions, including the leakage in the main pump line.\"}",
+            "name": "PathPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 62,
+        "prompt_tokens": 4569,
+        "total_tokens": 4631,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4480
+        }
+      },
+      "model_name": "gpt-4o-mini-2024-07-18",
+      "system_fingerprint": "fp_0950b7f384",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--4fb85a4d-a2af-4ce6-8c2d-a632595b13a7-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "PathPlan",
+        "args": {
+          "current_state": "state_initialStep",
+          "next_state": "state_filling_tank_B201",
+          "reasoning": "The system is in the initialization phase. The transition to state_filling_tank_B201 is always taken at process start, independent of system conditions, including the leakage in the main pump line."
+        },
+        "id": "call_m0Qrf4AskswzuCQFqwRh2btO",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 4569,
+      "output_tokens": 62,
+      "total_tokens": 4631,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 4480
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "current_state": "state_initialStep",
+    "next_state": "state_filling_tank_B201",
+    "reasoning": "The system is in the initialization phase. The transition to state_filling_tank_B201 is always taken at process start, independent of system conditions, including the leakage in the main pump line."
+  },
+  "agent_provided_rationale": "The system is in the initialization phase. The transition to state_filling_tank_B201 is always taken at process start, independent of system conditions, including the leakage in the main pump line.",
+  "usage": {
+    "input_tokens": 4569,
+    "output_tokens": 62,
+    "total_tokens": 4631
+  },
+  "latency_seconds": 2.0958994000102393
+}
