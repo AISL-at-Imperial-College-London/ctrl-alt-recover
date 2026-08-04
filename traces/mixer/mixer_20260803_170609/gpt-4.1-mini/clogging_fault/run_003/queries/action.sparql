@@ -1,0 +1,69 @@
+PREFIX :        <http://example.org/mixer#>
+PREFIX UML:     <http://www.hsu-ifa.de/ontologies/UMLStateMachine#>
+PREFIX VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#>
+PREFIX VDI3682: <http://www.w3id.org/hsu-aut/VDI3682#>
+PREFIX CPSMod:  <http://www.hsu-ifa.de/ontologies/CPSMod#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+
+CONSTRUCT {
+  # Seed (context)
+  :mixerModule1234 a VDI2206:Module .
+  :mixing1234 a VDI3682:ProcessOperator ;
+              VDI3682:isAssignedto :mixerModule1234 ;
+              CPSMod:processRealizesBehavior :MixerStateMachine .
+
+  # States with labels and local names
+  ?state a UML:State ;
+         rdfs:label ?state_label ;
+         :localName ?state_id .
+
+  # Actions (only true UML:Action)
+  ?state UML:doAction ?action .
+  ?action a UML:Action ;
+          rdfs:label ?action_label ;
+          :localName ?action_id .
+
+  # Actuators linked to Actions
+  ?action CPSMod:isChangedByActuator ?actuator .
+  ?actuator a VDI2206:Actuator ;
+            rdfs:label ?actuator_label ;
+            :localName ?actuator_id .
+}
+WHERE {
+  GRAPH <http://www.hsu-ifa.de/graphs/mixerModuleImperial> {
+
+    # Seed
+    :mixerModule1234 a VDI2206:Module .
+    :mixing1234 a VDI3682:ProcessOperator ;
+                VDI3682:isAssignedto :mixerModule1234 ;
+                CPSMod:processRealizesBehavior :MixerStateMachine .
+
+    # Initial State (fallback)
+    OPTIONAL { :MixerStateMachine UML:initialState ?init }
+    BIND(COALESCE(?init, :state_initialStep) AS ?start)
+
+    # All reachable States
+    ?start ( (^UML:sourceState|^UML:targetState) / (UML:sourceState|UML:targetState) )* ?state .
+    ?state a UML:State .
+    OPTIONAL { ?state rdfs:label ?state_label }
+    BIND(REPLACE(STR(?state), ".*[/#]", "") AS ?state_id)
+
+    # Actions (doAction)
+    OPTIONAL {
+      ?state UML:doAction ?action .
+      ?action a UML:Action .
+      OPTIONAL { ?action rdfs:label ?action_label }
+      BIND(REPLACE(STR(?action), ".*[/#]", "") AS ?action_id)
+
+      # Actuators (both directions for robustness)
+      OPTIONAL {
+        { ?action CPSMod:isChangedByActuator ?actuator }
+        UNION
+        { ?actuator CPSMod:isChangedByActuator ?action }
+        ?actuator a VDI2206:Actuator .
+      }
+      OPTIONAL { ?actuator rdfs:label ?actuator_label }
+      OPTIONAL { BIND(REPLACE(STR(?actuator), ".*[/#]", "") AS ?actuator_id) }
+    }
+  }
+}

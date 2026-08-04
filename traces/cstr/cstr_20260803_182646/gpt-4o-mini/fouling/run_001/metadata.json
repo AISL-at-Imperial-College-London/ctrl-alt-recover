@@ -1,0 +1,19 @@
+{
+  "trace_version": "1.0",
+  "case_study": "cstr",
+  "model": "gpt-4o-mini",
+  "fault": "fouling",
+  "run": 1,
+  "experiment_id": "cstr_20260803_182646",
+  "repository_commit": "2516f0611ae385a32282e8f55a8e11e519be811d",
+  "started_at_utc": "2026-08-03T17:27:31.948604Z",
+  "detector_mode": "3sigma",
+  "fault_source": "configured_simulation_scenario",
+  "trajectory_condition": "fault",
+  "configured_setpoints": {
+    "T_sp": 310.0,
+    "L_sp": 10.0,
+    "Fin_sp": 0.03333333333333333
+  },
+  "T_end": 8000.0
+}

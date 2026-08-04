@@ -1,0 +1,62 @@
+{
+  "trace_version": "1.0",
+  "run_directory": "cstr/cstr_20260803_201135/gpt-4.1-mini/fouling/run_008",
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "path": "metadata.json",
+      "bytes": 514,
+      "sha256": "857ef2a104a4da88a5b7204bfd126f8e3fbbb3f98f2790e811417c15723a2aa8"
+    },
+    {
+      "path": "queries/action_context.sparql",
+      "bytes": 8465,
+      "sha256": "64c2de3950865b6c52fc0d22b36ec1acf05c746db6b55dbce9a47a446d9d3314"
+    },
+    {
+      "path": "subgraphs/action_context.ttl",
+      "bytes": 10474,
+      "sha256": "60fa8ab640f3ff516da4c933f7eea3e71908e41e2c325e7c37a967df221ddc69"
+    },
+    {
+      "path": "prompts/call_0001_action_iteration_0001.json",
+      "bytes": 14509,
+      "sha256": "d4a0e5c0d614677ff94d1dd6fd6bb5cf285b2e4f6dc271ef27b2668b402aa8cd"
+    },
+    {
+      "path": "responses/call_0001_action_iteration_0001.json",
+      "bytes": 2820,
+      "sha256": "38a618b5125f1c6f8f928a13e5ada95953811454e230ff9ef6a22491b92b43a2"
+    },
+    {
+      "path": "prompts/call_0002_action_iteration_0002.json",
+      "bytes": 14721,
+      "sha256": "bc1a351041eb8d173955e0b2f286fcf123a90b7c944cc1e3b677fe33466a6c99"
+    },
+    {
+      "path": "responses/call_0002_action_iteration_0002.json",
+      "bytes": 2909,
+      "sha256": "be5e991d48f59fe101fc0066ce8af96ea49d4c923aa9aef97d405a2ba3eb2a71"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0002.csv",
+      "bytes": 1766821,
+      "sha256": "694673f0f42f08f615938238f033ccbcda791e8ff8f631fab5a9f84e9afb64c0"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0002.metadata.json",
+      "bytes": 683,
+      "sha256": "a27ee37cc70409e1c4f9f759eb3594dab99f5fde5bf251168e547d1b9cbbd952"
+    },
+    {
+      "path": "final_result.json",
+      "bytes": 1437,
+      "sha256": "543b5ce1593729e242dffa8b7e266eb09b073918621c664738cafcc6bd1ca8ec"
+    },
+    {
+      "path": "events.jsonl",
+      "bytes": 6116,
+      "sha256": "7764289188f6baab94838709a8142fe47a2cc527f724d9ce7afde0471580826b"
+    }
+  ]
+}

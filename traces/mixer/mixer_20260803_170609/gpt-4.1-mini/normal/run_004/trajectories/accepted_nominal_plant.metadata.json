@@ -1,0 +1,9 @@
+{
+  "name": "accepted_nominal_plant",
+  "accepted": true,
+  "condition": "nominal",
+  "rows": 8,
+  "fault": "normal",
+  "source": "executed_plant_history",
+  "purpose": "sequence_and_loop_performance_analysis"
+}

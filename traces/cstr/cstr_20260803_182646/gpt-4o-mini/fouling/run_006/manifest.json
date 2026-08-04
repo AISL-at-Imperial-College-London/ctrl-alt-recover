@@ -1,0 +1,82 @@
+{
+  "trace_version": "1.0",
+  "run_directory": "cstr/cstr_20260803_182646/gpt-4o-mini/fouling/run_006",
+  "artifact_count": 15,
+  "artifacts": [
+    {
+      "path": "metadata.json",
+      "bytes": 513,
+      "sha256": "41408f2d528db01e6bae662e0b974549987702220c864f09ac56136b40859a8d"
+    },
+    {
+      "path": "queries/action_context.sparql",
+      "bytes": 8465,
+      "sha256": "64c2de3950865b6c52fc0d22b36ec1acf05c746db6b55dbce9a47a446d9d3314"
+    },
+    {
+      "path": "subgraphs/action_context.ttl",
+      "bytes": 10474,
+      "sha256": "60fa8ab640f3ff516da4c933f7eea3e71908e41e2c325e7c37a967df221ddc69"
+    },
+    {
+      "path": "prompts/call_0001_action_iteration_0001.json",
+      "bytes": 14538,
+      "sha256": "60a10711f66a07f47f4301e9b227401a2f479490a8e51da7190c5cdd6cb3d20d"
+    },
+    {
+      "path": "responses/call_0001_action_iteration_0001.json",
+      "bytes": 3147,
+      "sha256": "f852ce8eb6e467da6bf7355a177f383a31d2de31722a6dccafa23fbd52bef1cc"
+    },
+    {
+      "path": "prompts/call_0002_action_iteration_0002.json",
+      "bytes": 14750,
+      "sha256": "b36e574575cd195b76845230782bbb3b57cbdafbd79b15ad5a10d8fb32037b72"
+    },
+    {
+      "path": "responses/call_0002_action_iteration_0002.json",
+      "bytes": 2782,
+      "sha256": "fecbfd3a47e164d9693eded7d7590511a8e037cd521f2c508ce9f644e416f944"
+    },
+    {
+      "path": "prompts/call_0003_action_iteration_0003.json",
+      "bytes": 14749,
+      "sha256": "e503da04c9bb16a19ea72a4ae89ac3b41755c24747ec255fa3eb2028d1ee6469"
+    },
+    {
+      "path": "responses/call_0003_action_iteration_0003.json",
+      "bytes": 2825,
+      "sha256": "9543326b6b54fc3ae4ce41ea07b745dff4ebc9ecb6e7a1cc11b8751e144448e5"
+    },
+    {
+      "path": "prompts/call_0004_action_iteration_0004.json",
+      "bytes": 14750,
+      "sha256": "75db1d5b9fa787da6ede4f209d173ff965fcf01d73346bbb904ea662422ac134"
+    },
+    {
+      "path": "responses/call_0004_action_iteration_0004.json",
+      "bytes": 2652,
+      "sha256": "e840ccd173e7f2efde248850017bd94c0a915950608ab2e4b7e6a1b2ee9ff77d"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0004.csv",
+      "bytes": 1664468,
+      "sha256": "334f6de21ec47a7caf44b12b8590bf1948c26a0b876050ee29640d23207b2605"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0004.metadata.json",
+      "bytes": 683,
+      "sha256": "664237645fa40c342481c1240714aa7345cc4d27a334e7ae0ebbf07761fc827a"
+    },
+    {
+      "path": "final_result.json",
+      "bytes": 1437,
+      "sha256": "c2dc640cf388241509e38838add242210a3884e042c542ce16507c642289aa70"
+    },
+    {
+      "path": "events.jsonl",
+      "bytes": 9035,
+      "sha256": "824db1fd3f9a6ec23f985c418a7767a7ee4cfc8a9c3771b5f3a978f9fca0f83a"
+    }
+  ]
+}

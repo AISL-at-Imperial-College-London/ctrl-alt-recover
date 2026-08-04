@@ -1,0 +1,72 @@
+{
+  "trace_version": "1.0",
+  "run_directory": "cstr/cstr_20260803_201135/gpt-4.1-mini/cool_stuck_closed/run_000",
+  "artifact_count": 13,
+  "artifacts": [
+    {
+      "path": "metadata.json",
+      "bytes": 524,
+      "sha256": "f7bb921f2d93a6da8336d9922e7a273e5b2a7a43bf19c12d2795ddf8859bf87f"
+    },
+    {
+      "path": "queries/action_context.sparql",
+      "bytes": 8465,
+      "sha256": "64c2de3950865b6c52fc0d22b36ec1acf05c746db6b55dbce9a47a446d9d3314"
+    },
+    {
+      "path": "subgraphs/action_context.ttl",
+      "bytes": 10474,
+      "sha256": "60fa8ab640f3ff516da4c933f7eea3e71908e41e2c325e7c37a967df221ddc69"
+    },
+    {
+      "path": "prompts/call_0001_action_iteration_0001.json",
+      "bytes": 14416,
+      "sha256": "400afe048afc2fd35331b895ad3f90b0b30e722206edb10c0f691cac8fd2fa4b"
+    },
+    {
+      "path": "responses/call_0001_action_iteration_0001.json",
+      "bytes": 2677,
+      "sha256": "19130afa56ea01928d5838612bb80c8ab36663ba5953f4b91f8b03d2971572c3"
+    },
+    {
+      "path": "prompts/call_0002_action_iteration_0002.json",
+      "bytes": 14623,
+      "sha256": "0ac362cfd3f0a15da173f52004d272d4a4bb53c364847cb821486f846353d645"
+    },
+    {
+      "path": "responses/call_0002_action_iteration_0002.json",
+      "bytes": 2999,
+      "sha256": "796ae4947399e80b5565e5393cf468a43f4e9f33d080fb1e190a60935d3d7573"
+    },
+    {
+      "path": "prompts/call_0003_action_iteration_0003.json",
+      "bytes": 14624,
+      "sha256": "e6be633d64c2e2bdc5619eb89f8488315c511854e2a3b81c140785fae9312a09"
+    },
+    {
+      "path": "responses/call_0003_action_iteration_0003.json",
+      "bytes": 2524,
+      "sha256": "3b9001f3be17dc82e65dbd977f1fb0736061c11fa89d2d13a6184c90847f3ece"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0003.csv",
+      "bytes": 2567329,
+      "sha256": "10c7af37ecc954ddafd3cf14d69096902d812e26488b774f09023343903628d3"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0003.metadata.json",
+      "bytes": 686,
+      "sha256": "2fc444ecc7f7665af70ffe5244a72e9d49f44abca9feac31ce5656621be9ad9e"
+    },
+    {
+      "path": "final_result.json",
+      "bytes": 1448,
+      "sha256": "34645392d365497d454920730d5ee645e8e5587b2bfe234e1454c53bd537a3d8"
+    },
+    {
+      "path": "events.jsonl",
+      "bytes": 7499,
+      "sha256": "53bbb4954056b078b31c009f4377c42d9f125beb24ac561060236f23d9d7cdbf"
+    }
+  ]
+}

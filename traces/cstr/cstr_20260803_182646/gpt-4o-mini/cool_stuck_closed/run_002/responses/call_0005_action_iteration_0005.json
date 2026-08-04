@@ -1,0 +1,85 @@
+{
+  "agent": "action",
+  "iteration": 5,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_VBbd820xqmmxCpCYrz2hHwID",
+          "function": {
+            "arguments": "{\"T_sp\":310.0,\"L_sp\":10.0,\"Fin_sp\":0.02833333333333333,\"reasoning\":\"Since T_meas is above T_sp and the cooling is not saturated (u_cool is 0.3), I will reduce Fin_sp to decrease the load on the system (PO8). This is a different proposal than the previous one.\"}",
+            "name": "SetpointPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 81,
+        "prompt_tokens": 4478,
+        "total_tokens": 4559,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4352
+        }
+      },
+      "model_name": "gpt-4o-mini-2024-07-18",
+      "system_fingerprint": "fp_c400bf5046",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--d4994a0b-98bb-4998-b788-3300fc4c244a-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "SetpointPlan",
+        "args": {
+          "T_sp": 310.0,
+          "L_sp": 10.0,
+          "Fin_sp": 0.02833333333333333,
+          "reasoning": "Since T_meas is above T_sp and the cooling is not saturated (u_cool is 0.3), I will reduce Fin_sp to decrease the load on the system (PO8). This is a different proposal than the previous one."
+        },
+        "id": "call_VBbd820xqmmxCpCYrz2hHwID",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 4478,
+      "output_tokens": 81,
+      "total_tokens": 4559,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 4352
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "T_sp": 310.0,
+    "Fin_sp": 0.02833333333333333,
+    "L_sp": 10.0,
+    "reasoning": "Since T_meas is above T_sp and the cooling is not saturated (u_cool is 0.3), I will reduce Fin_sp to decrease the load on the system (PO8). This is a different proposal than the previous one."
+  },
+  "agent_provided_rationale": "Since T_meas is above T_sp and the cooling is not saturated (u_cool is 0.3), I will reduce Fin_sp to decrease the load on the system (PO8). This is a different proposal than the previous one.",
+  "usage": {
+    "prompt_tokens": 4478,
+    "completion_tokens": 81,
+    "total_tokens": 4559
+  },
+  "latency_seconds": 2.1821790999965742
+}

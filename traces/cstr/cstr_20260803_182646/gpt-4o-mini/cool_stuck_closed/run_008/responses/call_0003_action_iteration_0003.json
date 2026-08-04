@@ -1,0 +1,85 @@
+{
+  "agent": "action",
+  "iteration": 3,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_A8wwKstDevoAZ4EhGxdWQdwq",
+          "function": {
+            "arguments": "{\"T_sp\":310.0,\"L_sp\":10.0,\"Fin_sp\":0.02833333333333333,\"reasoning\":\"Since T_meas is above T_sp and the cooling is not saturated (u_cool is low), I will keep T_sp at 310.0 K. To reduce the load and help bring T_meas down, I will decrease Fin_sp to 0.02833 L/s (via PO8 -> u_valve_cmd -> Fin). This is a different proposal than the previous one.\"}",
+            "name": "SetpointPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 111,
+        "prompt_tokens": 4478,
+        "total_tokens": 4589,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 4224
+        }
+      },
+      "model_name": "gpt-4o-mini-2024-07-18",
+      "system_fingerprint": "fp_c400bf5046",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--dc0961ac-3883-4f8f-aa91-d530f7c68644-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "SetpointPlan",
+        "args": {
+          "T_sp": 310.0,
+          "L_sp": 10.0,
+          "Fin_sp": 0.02833333333333333,
+          "reasoning": "Since T_meas is above T_sp and the cooling is not saturated (u_cool is low), I will keep T_sp at 310.0 K. To reduce the load and help bring T_meas down, I will decrease Fin_sp to 0.02833 L/s (via PO8 -> u_valve_cmd -> Fin). This is a different proposal than the previous one."
+        },
+        "id": "call_A8wwKstDevoAZ4EhGxdWQdwq",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 4478,
+      "output_tokens": 111,
+      "total_tokens": 4589,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 4224
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "T_sp": 310.0,
+    "Fin_sp": 0.02833333333333333,
+    "L_sp": 10.0,
+    "reasoning": "Since T_meas is above T_sp and the cooling is not saturated (u_cool is low), I will keep T_sp at 310.0 K. To reduce the load and help bring T_meas down, I will decrease Fin_sp to 0.02833 L/s (via PO8 -> u_valve_cmd -> Fin). This is a different proposal than the previous one."
+  },
+  "agent_provided_rationale": "Since T_meas is above T_sp and the cooling is not saturated (u_cool is low), I will keep T_sp at 310.0 K. To reduce the load and help bring T_meas down, I will decrease Fin_sp to 0.02833 L/s (via PO8 -> u_valve_cmd -> Fin). This is a different proposal than the previous one.",
+  "usage": {
+    "prompt_tokens": 4478,
+    "completion_tokens": 111,
+    "total_tokens": 4589
+  },
+  "latency_seconds": 2.2170848000096157
+}

@@ -1,0 +1,52 @@
+{
+  "trace_version": "1.0",
+  "run_directory": "cstr/cstr_20260803_201135/gpt-4.1-mini/pump_degrade/run_008",
+  "artifact_count": 9,
+  "artifacts": [
+    {
+      "path": "metadata.json",
+      "bytes": 519,
+      "sha256": "713abca4adc72c395a215ad9b6fb21ee4a363dee871f2f3a560024f878b10dd9"
+    },
+    {
+      "path": "queries/action_context.sparql",
+      "bytes": 8465,
+      "sha256": "64c2de3950865b6c52fc0d22b36ec1acf05c746db6b55dbce9a47a446d9d3314"
+    },
+    {
+      "path": "subgraphs/action_context.ttl",
+      "bytes": 10474,
+      "sha256": "60fa8ab640f3ff516da4c933f7eea3e71908e41e2c325e7c37a967df221ddc69"
+    },
+    {
+      "path": "prompts/call_0001_action_iteration_0001.json",
+      "bytes": 14451,
+      "sha256": "2a3f12faab9acc64e31c5bf36ac6945f04753deff79a77a02c33440c2f21a775"
+    },
+    {
+      "path": "responses/call_0001_action_iteration_0001.json",
+      "bytes": 2597,
+      "sha256": "c3d0885bfcda3de15458a109c16ad4beafadba51a1207e63c4aed2a13b616ff2"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0001.csv",
+      "bytes": 2940856,
+      "sha256": "9960ede144c738496d2ace99e530387dff9fe795f998101e19524786c6ce2ded"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0001.metadata.json",
+      "bytes": 697,
+      "sha256": "81ba62b6add80ba2af30145ab7360f5e2a40127e8eaf6c0d2e1b34650ad486a5"
+    },
+    {
+      "path": "final_result.json",
+      "bytes": 1452,
+      "sha256": "fe0f0c2409c926aab603600414ad7fb9ba8f09c188f33fc53775ca21d1351466"
+    },
+    {
+      "path": "events.jsonl",
+      "bytes": 4619,
+      "sha256": "473a28d0919039a7a31f65fd4eabed8e2c24515aeeab0d26df3a8c41ccdeaec7"
+    }
+  ]
+}

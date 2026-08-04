@@ -1,0 +1,254 @@
+@prefix : <http://example.org/cstr#> .
+@prefix VDI3682: <http://www.w3id.org/hsu-aut/VDI3682#> .
+@prefix VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#> .
+@prefix CPSMod: <http://www.hsu-ifa.de/ontologies/CPSMod#> .
+@prefix DIN17359: <http://www.hsu-ifa.de/ontologies/DIN17359#> .
+@prefix DINEN61360: <http://www.hsu-ifa.de/ontologies/DINEN61360#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdf4j: <http://rdf4j.org/schema/rdf4j#> .
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+
+:PO4_ReactionRates a VDI3682:ProcessOperator;
+  rdfs:label "PO4 – Reaction Rates (Arrhenius)"@en;
+  VDI3682:hasInput :information_T_meas, :state_CA, :state_CD, :information_k01, :information_k02,
+    :information_EA1, :information_EA2, :information_R_gas;
+  VDI3682:hasOutput :information_R1, :information_R2;
+  CPSMod:processRealizesBehavior :Equation_PO4_R1, :Equation_PO4_R2;
+  VDI3682:isAssignedTo :module_Reactor .
+
+:Equation_PO4_R1 a VDI2206:MathematicalModel;
+  rdfs:label "R1 = k01 × exp(-EA1 / (R × T)) × CA × CD"@en .
+
+:information_T_meas CPSMod:isCharacterizedByParameter :obs_param_T_meas .
+
+:obs_param_T_meas a DIN17359:Parameter, sosa:ObservableProperty .
+
+:module_Reactor a VDI2206:Module;
+  VDI2206:ModuleConsistsOfComponent :agitator, :tank_reactor, :sensor_LT, :sensor_TT .
+
+:sensor_LT a VDI2206:Sensor .
+
+:sensor_TT a VDI2206:Sensor .
+
+:state_CA CPSMod:isCharacterizedByParameter :obs_param_CA .
+
+:obs_param_CA a DIN17359:Parameter .
+
+:state_CD CPSMod:isCharacterizedByParameter :obs_param_CD .
+
+:obs_param_CD a DIN17359:Parameter .
+
+:Equation_PO4_R2 a VDI2206:MathematicalModel;
+  rdfs:label "R2 = k02 × exp(-EA2 / (R × T)) × CA"@en .
+
+:PO5_StateDerivatives a VDI3682:ProcessOperator;
+  rdfs:label "PO5 – State Derivatives (Balances)"@en;
+  VDI3682:hasInput :product_CA_in, :product_CD_in, :energy_Tc, :energy_Tin, :information_T_meas,
+    :information_L_meas, :information_Fin, :information_Fout, :information_UA_eff, :information_Fc,
+    :state_CA, :state_CD, :information_R1, :information_R2, :state_CB, :state_CC, :information_Cp,
+    :information_DH1, :information_DH2, :information_F_leak, :information_F_overflow;
+  VDI3682:hasOutput :information_T_meas, :information_L_meas, :information_dV_dt, :information_dCA_dt,
+    :information_dCB_dt, :information_dCC_dt, :information_dCD_dt, :information_dT_dt,
+    :information_dL_dt;
+  CPSMod:processRealizesBehavior :Equation_PO5_dV, :Equation_PO5_dCA, :Equation_PO5_dCB,
+    :Equation_PO5_dCC, :Equation_PO5_dCD, :Equation_PO5_dT;
+  VDI3682:isAssignedTo :module_Reactor .
+
+:Equation_PO5_dV a VDI2206:MathematicalModel;
+  rdfs:label "dV/dt = Fin - Fout - F_leak - F_overflow"@en .
+
+:information_L_meas CPSMod:isCharacterizedByParameter :obs_param_L_meas .
+
+:obs_param_L_meas a DIN17359:Parameter, sosa:ObservableProperty .
+
+:information_Fin CPSMod:isCharacterizedByParameter :obs_param_Fin, :obs_param_mass_balance .
+
+:obs_param_Fin a DIN17359:Parameter, sosa:ObservableProperty .
+
+:obs_param_mass_balance a DIN17359:Parameter, sosa:ObservableProperty .
+
+:information_Fout CPSMod:isCharacterizedByParameter :obs_param_mass_balance, :obs_param_Fout .
+
+:obs_param_Fout a DIN17359:Parameter, sosa:ObservableProperty .
+
+:information_Fc CPSMod:isCharacterizedByParameter :obs_param_Fc .
+
+:obs_param_Fc a DIN17359:Parameter, sosa:ObservableProperty .
+
+:state_CB CPSMod:isCharacterizedByParameter :obs_param_CB .
+
+:obs_param_CB a DIN17359:Parameter .
+
+:state_CC CPSMod:isCharacterizedByParameter :obs_param_CC .
+
+:obs_param_CC a DIN17359:Parameter .
+
+:information_dV_dt CPSMod:isCharacterizedByParameter :obs_param_dL_dt .
+
+:obs_param_dL_dt a DIN17359:Parameter .
+
+:information_dCA_dt CPSMod:isCharacterizedByParameter :obs_param_dCA_dt .
+
+:obs_param_dCA_dt a DIN17359:Parameter .
+
+:information_dCB_dt CPSMod:isCharacterizedByParameter :obs_param_dCB_dt .
+
+:obs_param_dCB_dt a DIN17359:Parameter .
+
+:information_dT_dt CPSMod:isCharacterizedByParameter :obs_param_dT_dt .
+
+:obs_param_dT_dt a DIN17359:Parameter .
+
+:Equation_PO5_dCA a VDI2206:MathematicalModel;
+  rdfs:label "dCA/dt = (Fin/V) × CA_in - (Fout/V) × CA - R1 - R2"@en .
+
+:Equation_PO5_dCB a VDI2206:MathematicalModel;
+  rdfs:label "dCB/dt = -(Fout/V) × CB + R1"@en .
+
+:Equation_PO5_dCC a VDI2206:MathematicalModel;
+  rdfs:label "dCC/dt = -(Fout/V) × CC + R2"@en .
+
+:Equation_PO5_dCD a VDI2206:MathematicalModel;
+  rdfs:label "dCD/dt = (Fin/V) × CD_in - (Fout/V) × CD - R1"@en .
+
+:Equation_PO5_dT a VDI2206:MathematicalModel;
+  rdfs:label "dT/dt = (Fin/V) × (Tin - T) + (-DH1 × R1 - DH2 × R2) / Cp - (UA_scaled / (V × Cp)) × (T - Tc)"@en .
+
+:PO1_InletFlow a VDI3682:ProcessOperator;
+  rdfs:label "PO1 – Inlet Effective Flow"@en;
+  VDI3682:hasInput :product_CA_in, :product_CD_in, :energy_Tin, :information_Cv_max_valve,
+    :information_u_valve_cmd;
+  VDI3682:hasOutput :product_CA_in, :product_CD_in, :energy_Tin, :information_Fin, :information_u_valve;
+  CPSMod:processRealizesBehavior :Equation_PO1_InletFlow;
+  VDI3682:isAssignedTo :module_Inlet .
+
+:Equation_PO1_InletFlow a VDI2206:MathematicalModel;
+  rdfs:label "Fin = Cv_max_valve × valve_opening"@en .
+
+:information_u_valve_cmd CPSMod:isCharacterizedByParameter :obs_param_u_valve_cmd .
+
+:obs_param_u_valve_cmd a DIN17359:Parameter, sosa:ActuatableProperty .
+
+:module_Inlet a VDI2206:Module;
+  VDI2206:ModuleConsistsOfComponent :actuator_valve_in, :controller_PID_F, :pipe_inlet,
+    :sensor_inlet_FT .
+
+:actuator_valve_in a VDI2206:Actuator .
+
+:controller_PID_F a VDI2206:InformationProcessing .
+
+:sensor_inlet_FT a VDI2206:Sensor .
+
+:information_u_valve CPSMod:isCharacterizedByParameter :obs_param_u_valve .
+
+:obs_param_u_valve a DIN17359:Parameter, sosa:ActuatableProperty .
+
+:PO2_OutletFlow a VDI3682:ProcessOperator;
+  rdfs:label "PO2 – Outlet Effective Flow"@en;
+  VDI3682:hasInput :product_CA_out, :product_CB_out, :product_CC_out, :product_CD_out,
+    :information_Kq_pump, :information_pump_flow_factor, :information_u_pump_cmd;
+  VDI3682:hasOutput :product_CA_out, :product_CB_out, :product_CC_out, :product_CD_out,
+    :information_Fout, :information_u_pump;
+  CPSMod:processRealizesBehavior :Equation_PO2_OutletFlow;
+  VDI3682:isAssignedTo :module_Outlet .
+
+:Equation_PO2_OutletFlow a VDI2206:MathematicalModel;
+  rdfs:label "Fout = Kq_pump × pump_speed × pump_flow_factor(t)"@en .
+
+:information_u_pump_cmd CPSMod:isCharacterizedByParameter :obs_param_u_pump_cmd .
+
+:obs_param_u_pump_cmd a DIN17359:Parameter, sosa:ActuatableProperty .
+
+:module_Outlet a VDI2206:Module;
+  VDI2206:ModuleConsistsOfComponent :actuator_pump_out, :controller_PID_L, :pipe_outlet,
+    :sensor_outlet_FT .
+
+:actuator_pump_out a VDI2206:Actuator .
+
+:controller_PID_L a VDI2206:InformationProcessing .
+
+:sensor_outlet_FT a VDI2206:Sensor .
+
+:information_u_pump CPSMod:isCharacterizedByParameter :obs_param_u_pump .
+
+:obs_param_u_pump a DIN17359:Parameter, sosa:ActuatableProperty .
+
+:PO3_CoolingFlow a VDI3682:ProcessOperator;
+  rdfs:label "PO3 – Cooling Flow and Heat Transfer"@en;
+  VDI3682:hasInput :energy_Tc, :information_T_meas, :information_UA_eff, :information_Cv_max_cool,
+    :information_Fc_in_base, :information_u_cool_cmd;
+  VDI3682:hasOutput :information_Fc, :information_u_cool, :energy_Q_cool;
+  CPSMod:processRealizesBehavior :Equation_PO3_CoolingFlow, :Equation_PO3_HeatTransfer;
+  VDI3682:isAssignedTo :module_Cooling .
+
+:Equation_PO3_CoolingFlow a VDI2206:MathematicalModel;
+  rdfs:label "Fc = Cv_max_cool × cool_opening"@en .
+
+:module_Cooling a VDI2206:Module;
+  VDI2206:ModuleConsistsOfComponent :actuator_cool_valve, :controller_PID_T, :pipe_cooling,
+    :sensor_cooling_FT .
+
+:actuator_cool_valve a VDI2206:Actuator .
+
+:controller_PID_T a VDI2206:InformationProcessing .
+
+:sensor_cooling_FT a VDI2206:Sensor .
+
+:information_u_cool_cmd CPSMod:isCharacterizedByParameter :obs_param_u_cool_cmd .
+
+:obs_param_u_cool_cmd a DIN17359:Parameter, sosa:ActuatableProperty .
+
+:information_u_cool CPSMod:isCharacterizedByParameter :obs_param_u_cool .
+
+:obs_param_u_cool a DIN17359:Parameter, sosa:ActuatableProperty .
+
+:Equation_PO3_HeatTransfer a VDI2206:MathematicalModel;
+  rdfs:label "Q_cool = UA_scaled × (T - Tc), where UA_scaled = UA_eff × (Fc / Fc_in_base)"@en .
+
+:PO6_LevelPID a VDI3682:ProcessOperator;
+  rdfs:label "PO6 – Level PID Controller"@en;
+  VDI3682:hasInput :information_L_meas, :information_Fin, :information_Kq_pump, :information_Kp_L,
+    :information_Ki_L, :information_L_sp;
+  VDI3682:hasOutput :information_u_pump_cmd;
+  CPSMod:processRealizesBehavior :Equation_PO6_LevelPID;
+  VDI3682:isAssignedTo :module_Outlet .
+
+:Equation_PO6_LevelPID a VDI2206:MathematicalModel;
+  rdfs:label "u_pump = u_ff + Kp_L × e + Ki_L × ∫e dt, where e = L_meas - L_sp, u_ff = Fin / Kq"@en .
+
+:information_L_sp owl:sameAs :ref_L_sp .
+
+:ref_L_sp DIN17359:referenceValue 1.0E1 .
+
+:PO7_TempPID a VDI3682:ProcessOperator;
+  rdfs:label "PO7 – Temperature PID Controller"@en;
+  VDI3682:hasInput :information_T_meas, :information_Kp_T, :information_Ki_T, :information_T_sp;
+  VDI3682:hasOutput :information_u_cool_cmd;
+  CPSMod:processRealizesBehavior :Equation_PO7_TempPID;
+  VDI3682:isAssignedTo :module_Cooling .
+
+:Equation_PO7_TempPID a VDI2206:MathematicalModel;
+  rdfs:label "u_cool = Kp_T × e + Ki_T × ∫e dt, where e = T_meas - T_sp (reverse-acting)"@en .
+
+:information_T_sp owl:sameAs :ref_T_sp .
+
+:ref_T_sp DIN17359:referenceValue 3.1E2 .
+
+:PO8_FlowPID a VDI3682:ProcessOperator;
+  rdfs:label "PO8 – Inlet Flow PID Controller"@en;
+  VDI3682:hasInput :information_Fin_meas, :information_Fin_sp, :information_Kp_F, :information_Ki_F;
+  VDI3682:hasOutput :information_u_valve_cmd;
+  CPSMod:processRealizesBehavior :Equation_PO8_FlowPID;
+  VDI3682:isAssignedTo :module_Inlet .
+
+:Equation_PO8_FlowPID a VDI2206:MathematicalModel;
+  rdfs:label "u_valve = Kp_F × e + Ki_F × ∫e dt, where e = Fin_sp - Fin_meas"@en .
+
+:information_Fin_sp owl:sameAs :ref_Fin_sp .
+
+:ref_Fin_sp DIN17359:referenceValue 3.33E-2 .

@@ -1,0 +1,85 @@
+{
+  "agent": "action",
+  "iteration": 1,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_EUBCpUVrSqtTbXRSuALw4VqD",
+          "function": {
+            "arguments": "{\"T_sp\":310.0,\"L_sp\":10.0,\"Fin_sp\":0.02833333333333333,\"reasoning\":\"Since u_cool is saturated (u_cool near 0.95) and T_meas is above T_sp, I propose reducing Fin_sp to decrease heat input (via PO8 -> u_valve_cmd -> Fin) and help bring T_meas closer to T_sp.\"}",
+            "name": "SetpointPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 88,
+        "prompt_tokens": 4433,
+        "total_tokens": 4521,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 3968
+        }
+      },
+      "model_name": "gpt-4o-mini-2024-07-18",
+      "system_fingerprint": "fp_c400bf5046",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--0ec60041-c9f1-4ba6-acea-9d2e180044e3-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "SetpointPlan",
+        "args": {
+          "T_sp": 310.0,
+          "L_sp": 10.0,
+          "Fin_sp": 0.02833333333333333,
+          "reasoning": "Since u_cool is saturated (u_cool near 0.95) and T_meas is above T_sp, I propose reducing Fin_sp to decrease heat input (via PO8 -> u_valve_cmd -> Fin) and help bring T_meas closer to T_sp."
+        },
+        "id": "call_EUBCpUVrSqtTbXRSuALw4VqD",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 4433,
+      "output_tokens": 88,
+      "total_tokens": 4521,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 3968
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "T_sp": 310.0,
+    "Fin_sp": 0.02833333333333333,
+    "L_sp": 10.0,
+    "reasoning": "Since u_cool is saturated (u_cool near 0.95) and T_meas is above T_sp, I propose reducing Fin_sp to decrease heat input (via PO8 -> u_valve_cmd -> Fin) and help bring T_meas closer to T_sp."
+  },
+  "agent_provided_rationale": "Since u_cool is saturated (u_cool near 0.95) and T_meas is above T_sp, I propose reducing Fin_sp to decrease heat input (via PO8 -> u_valve_cmd -> Fin) and help bring T_meas closer to T_sp.",
+  "usage": {
+    "prompt_tokens": 4433,
+    "completion_tokens": 88,
+    "total_tokens": 4521
+  },
+  "latency_seconds": 2.3408512000460178
+}

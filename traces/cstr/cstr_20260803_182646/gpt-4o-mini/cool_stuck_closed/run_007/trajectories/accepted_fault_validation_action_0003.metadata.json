@@ -1,0 +1,28 @@
+{
+  "name": "accepted_fault_validation_action_0003",
+  "accepted": true,
+  "condition": "fault",
+  "rows": 5866,
+  "source": "digital_twin_validation",
+  "action_call": 3,
+  "proposed_setpoints": {
+    "T_sp": 309.95,
+    "L_sp": 10.0,
+    "Fin_sp": 0.025499999999999995
+  },
+  "validation_metrics": {
+    "t0": 2134.0,
+    "T_end": 8000.0,
+    "dt": 1.0,
+    "total_time_simulated": 5866.0,
+    "worst_zone": "UNSAFE",
+    "unsafe_time": 846.0,
+    "unsafe_fraction": 0.14422093419706786,
+    "time_to_safe": 279.0,
+    "peak_T_meas": 314.6424835084301,
+    "peak_u_cool": 0.3,
+    "peak_u_valve": 0.480536846640236,
+    "peak_u_pump": 1.0,
+    "any_invalid_actuators": false
+  }
+}

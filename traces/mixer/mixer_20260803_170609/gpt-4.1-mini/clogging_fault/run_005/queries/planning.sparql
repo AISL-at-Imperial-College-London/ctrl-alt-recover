@@ -1,0 +1,83 @@
+PREFIX :        <http://example.org/mixer#>
+PREFIX UML:     <http://www.hsu-ifa.de/ontologies/UMLStateMachine#>
+PREFIX VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#>
+PREFIX VDI3682: <http://www.w3id.org/hsu-aut/VDI3682#>
+PREFIX CPSMod:  <http://www.hsu-ifa.de/ontologies/CPSMod#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+
+CONSTRUCT {
+  # Seed-Kette (Module → ProcessOperator → StateMachine)
+  :mixerModule1234 a VDI2206:Module ;
+                   rdfs:label ?cpsL .
+  :mixing1234 a VDI3682:ProcessOperator ;
+              VDI3682:isAssignedto :mixerModule1234 ;
+              CPSMod:processRealizesBehavior :MixerStateMachine ;
+              rdfs:label ?poL .
+  :MixerStateMachine a UML:StateMachine ;
+                     rdfs:label ?smL .
+
+  # UML States
+  ?s a UML:State ;
+     rdfs:label ?sL .
+  ?t a UML:State ;
+     rdfs:label ?tL .
+
+  # UML Transitions WITH rdfs:comment (Domain Knowledge!)
+  ?tr a UML:Transition ;
+      UML:sourceState ?s ;
+      UML:targetState ?t ;
+      UML:transitionEvent ?e ;
+      UML:transitionGuard ?guard ;
+      rdfs:label ?trL ;
+      rdfs:comment ?trComment .
+
+  # Events
+  ?e a UML:Event ;
+     rdfs:label ?eL .
+
+  # Actions (only true UML:Action)
+  ?s UML:doAction ?a .
+  ?a a UML:Action ;
+     rdfs:label ?aL .
+}
+WHERE {
+  GRAPH <http://www.hsu-ifa.de/graphs/mixerModuleImperial> {
+    # --- Seed ---
+    :mixerModule1234 a VDI2206:Module .
+    :mixing1234 a VDI3682:ProcessOperator ;
+                VDI3682:isAssignedto :mixerModule1234 ;
+                CPSMod:processRealizesBehavior :MixerStateMachine .
+    OPTIONAL { :mixerModule1234 rdfs:label ?cpsL }
+    OPTIONAL { :mixing1234 rdfs:label ?poL }
+    OPTIONAL { :MixerStateMachine rdfs:label ?smL }
+
+    # Initial State (fallback to :state_initialStep)
+    OPTIONAL { :MixerStateMachine UML:initialState ?init }
+    BIND(COALESCE(?init, :state_initialStep) AS ?start)
+
+    # All reachable States from start
+    ?start ( (^UML:sourceState|^UML:targetState) / (UML:sourceState|UML:targetState) )* ?s .
+
+    # Transitions between reachable States
+    ?tr a UML:Transition ;
+        UML:sourceState ?s ;
+        UML:targetState ?t .
+    ?start ( (^UML:sourceState|^UML:targetState) / (UML:sourceState|UML:targetState) )* ?t .
+
+    # Transition metadata
+    OPTIONAL { ?tr UML:transitionEvent ?e . OPTIONAL { ?e rdfs:label ?eL } }
+    OPTIONAL { ?tr UML:transitionGuard ?guard }
+    OPTIONAL { ?tr rdfs:label ?trL }
+    OPTIONAL { ?tr rdfs:comment ?trComment }   # <-- DOMAIN KNOWLEDGE COMMENTS
+    OPTIONAL { ?s rdfs:label ?sL }
+    OPTIONAL { ?t rdfs:label ?tL }
+
+    # Actions (only UML:Action typed)
+    OPTIONAL {
+      ?s UML:doAction ?a .
+      ?a a UML:Action .
+      OPTIONAL { ?a rdfs:label ?aL }
+    }
+  }
+}

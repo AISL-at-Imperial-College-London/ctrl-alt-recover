@@ -1,0 +1,9 @@
+{
+  "name": "accepted_fault_plant",
+  "accepted": true,
+  "condition": "fault",
+  "rows": 8,
+  "fault": "clogging_fault",
+  "source": "executed_plant_history",
+  "purpose": "sequence_and_loop_performance_analysis"
+}

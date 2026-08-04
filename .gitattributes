@@ -1,0 +1,2 @@
+# Trace manifests hash exact file bytes; never perform line-ending conversion.
+traces/** -text

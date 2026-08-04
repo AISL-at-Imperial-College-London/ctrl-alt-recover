@@ -1,0 +1,83 @@
+{
+  "agent": "planning",
+  "iteration": 1,
+  "raw_response": {
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "call_4aQT47U2CkLxHvvIiOXgbjEB",
+          "function": {
+            "arguments": "{\"current_state\":\"state_initialStep\",\"next_state\":\"state_filling_tank_B201\",\"reasoning\":\"The current state is the initial step of the process. According to the state machine, the transition from state_initialStep to state_filling_tank_B201 is always taken at process start, independent of system conditions. This initiates the filling phase starting with tank B201.\"}",
+            "name": "PathPlan"
+          },
+          "type": "function"
+        }
+      ],
+      "refusal": null
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 78,
+        "prompt_tokens": 4563,
+        "total_tokens": 4641,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 3968
+        }
+      },
+      "model_name": "gpt-4.1-mini-2025-04-14",
+      "system_fingerprint": "fp_8376769835",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "type": "ai",
+    "name": null,
+    "id": "run--e2093968-67f2-4fba-9ad4-825f50e2fbd7-0",
+    "example": false,
+    "tool_calls": [
+      {
+        "name": "PathPlan",
+        "args": {
+          "current_state": "state_initialStep",
+          "next_state": "state_filling_tank_B201",
+          "reasoning": "The current state is the initial step of the process. According to the state machine, the transition from state_initialStep to state_filling_tank_B201 is always taken at process start, independent of system conditions. This initiates the filling phase starting with tank B201."
+        },
+        "id": "call_4aQT47U2CkLxHvvIiOXgbjEB",
+        "type": "tool_call"
+      }
+    ],
+    "invalid_tool_calls": [],
+    "usage_metadata": {
+      "input_tokens": 4563,
+      "output_tokens": 78,
+      "total_tokens": 4641,
+      "input_token_details": {
+        "audio": 0,
+        "cache_read": 3968
+      },
+      "output_token_details": {
+        "audio": 0,
+        "reasoning": 0
+      }
+    }
+  },
+  "parsed_response": {
+    "current_state": "state_initialStep",
+    "next_state": "state_filling_tank_B201",
+    "reasoning": "The current state is the initial step of the process. According to the state machine, the transition from state_initialStep to state_filling_tank_B201 is always taken at process start, independent of system conditions. This initiates the filling phase starting with tank B201."
+  },
+  "agent_provided_rationale": "The current state is the initial step of the process. According to the state machine, the transition from state_initialStep to state_filling_tank_B201 is always taken at process start, independent of system conditions. This initiates the filling phase starting with tank B201.",
+  "usage": {
+    "input_tokens": 4563,
+    "output_tokens": 78,
+    "total_tokens": 4641
+  },
+  "latency_seconds": 1.4750987000297755
+}

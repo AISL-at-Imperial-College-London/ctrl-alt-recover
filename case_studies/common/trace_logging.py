@@ -322,7 +322,7 @@ class TraceRecorder:
         self._artifact_record(self.events_path, events_content)
         manifest = {
             "trace_version": self.TRACE_VERSION,
-            "run_directory": self.run_dir.as_posix(),
+            "run_directory": self.run_dir.relative_to(self.base_dir).as_posix(),
             "artifact_count": len(self._artifacts),
             "artifacts": self._artifacts,
         }

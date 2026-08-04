@@ -1,0 +1,62 @@
+{
+  "trace_version": "1.0",
+  "run_directory": "cstr/cstr_20260803_182646/gpt-4o-mini/fouling/run_005",
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "path": "metadata.json",
+      "bytes": 513,
+      "sha256": "2de0677b69f40c0a8366bd1728d188fed73e31d6603269cf13472dd52e6d7484"
+    },
+    {
+      "path": "queries/action_context.sparql",
+      "bytes": 8465,
+      "sha256": "64c2de3950865b6c52fc0d22b36ec1acf05c746db6b55dbce9a47a446d9d3314"
+    },
+    {
+      "path": "subgraphs/action_context.ttl",
+      "bytes": 10474,
+      "sha256": "60fa8ab640f3ff516da4c933f7eea3e71908e41e2c325e7c37a967df221ddc69"
+    },
+    {
+      "path": "prompts/call_0001_action_iteration_0001.json",
+      "bytes": 14510,
+      "sha256": "84dbd3e8d55dc8155d107ce6b37b62cfa36d6b3930f3069a15347f2c95a9f299"
+    },
+    {
+      "path": "responses/call_0001_action_iteration_0001.json",
+      "bytes": 3168,
+      "sha256": "3d1f0ba63e1b69320dfebbe327ff4586e8cf424dfe30bc1a0b98e29a376e672b"
+    },
+    {
+      "path": "prompts/call_0002_action_iteration_0002.json",
+      "bytes": 14722,
+      "sha256": "7541aaed688d4938ec066571c822602ec467d0ff883c130a406ddc12d0a2ba9e"
+    },
+    {
+      "path": "responses/call_0002_action_iteration_0002.json",
+      "bytes": 2797,
+      "sha256": "a54f1b7e25c6d9b7a063ce7472f68dc8a4c53a1402140128fda98d71a4a5ea4e"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0002.csv",
+      "bytes": 1565703,
+      "sha256": "e83b83c5d20bb0c305272952a97f8a750a9755cb504a8af892079484e067e44c"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0002.metadata.json",
+      "bytes": 700,
+      "sha256": "c44b9d0b04abc07f3f20c00b3030638cc117d37ba6a83fd22e616b12e965481c"
+    },
+    {
+      "path": "final_result.json",
+      "bytes": 1450,
+      "sha256": "175bb05817bd033102adf797efae66fb1e06c27ff359904455d03559cb2e6656"
+    },
+    {
+      "path": "events.jsonl",
+      "bytes": 6201,
+      "sha256": "5b786b33e56731513aa70a8d9aae2a80ef1f3bd35df4fab2acb9e6f9fddd3a64"
+    }
+  ]
+}

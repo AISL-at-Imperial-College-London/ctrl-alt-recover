@@ -1,0 +1,13 @@
+{
+  "trace_version": "1.0",
+  "case_study": "mixer",
+  "model": "gpt-4o-mini",
+  "fault": "leak",
+  "run": 9,
+  "experiment_id": "mixer_20260803_174101",
+  "repository_commit": "2516f0611ae385a32282e8f55a8e11e519be811d",
+  "started_at_utc": "2026-08-03T16:57:02.216598Z",
+  "prompt_level": "normal",
+  "fault_source": "ground_truth_cli_argument",
+  "trajectory_condition": "fault"
+}

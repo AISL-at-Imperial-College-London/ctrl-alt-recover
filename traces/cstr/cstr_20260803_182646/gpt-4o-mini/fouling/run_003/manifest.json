@@ -1,0 +1,62 @@
+{
+  "trace_version": "1.0",
+  "run_directory": "cstr/cstr_20260803_182646/gpt-4o-mini/fouling/run_003",
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "path": "metadata.json",
+      "bytes": 513,
+      "sha256": "1d42fbbca827d34f53a56266ab08b42506fa4dc27160bc13cfbd26fb4132ea77"
+    },
+    {
+      "path": "queries/action_context.sparql",
+      "bytes": 8465,
+      "sha256": "64c2de3950865b6c52fc0d22b36ec1acf05c746db6b55dbce9a47a446d9d3314"
+    },
+    {
+      "path": "subgraphs/action_context.ttl",
+      "bytes": 10474,
+      "sha256": "60fa8ab640f3ff516da4c933f7eea3e71908e41e2c325e7c37a967df221ddc69"
+    },
+    {
+      "path": "prompts/call_0001_action_iteration_0001.json",
+      "bytes": 14510,
+      "sha256": "90b90057f38f6571da590096f3655877329f9368c8a9980904016d31ef37f6de"
+    },
+    {
+      "path": "responses/call_0001_action_iteration_0001.json",
+      "bytes": 2845,
+      "sha256": "5c90a1baf04b44abc60f741e913f0909aabf7a57f622ac893e448f6eb1c56d2b"
+    },
+    {
+      "path": "prompts/call_0002_action_iteration_0002.json",
+      "bytes": 14722,
+      "sha256": "8059cd2d732396575511c4fbb6b9c9eaad75cf8ca12256f4f8df38a495a2d9e5"
+    },
+    {
+      "path": "responses/call_0002_action_iteration_0002.json",
+      "bytes": 2741,
+      "sha256": "5db70b543ef2c623ccd29377619a7a9083490ace6d7f7c7ae239c0fbf7b7fac3"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0002.csv",
+      "bytes": 1709711,
+      "sha256": "3f441fc951aeac893201268c205f504cba60324a61daa47031e7c2ddd688cf1a"
+    },
+    {
+      "path": "trajectories/accepted_fault_validation_action_0002.metadata.json",
+      "bytes": 683,
+      "sha256": "2a085dc87ddea5f6b2b40c1b321de61d5baf71091039b44aaffccb8ca5789d82"
+    },
+    {
+      "path": "final_result.json",
+      "bytes": 1435,
+      "sha256": "4e2b97a867e38bac13a0508392417b1007c2cde6c46e447736701956672a0816"
+    },
+    {
+      "path": "events.jsonl",
+      "bytes": 6076,
+      "sha256": "c6d98c6d003adb8fbcd03e35088e8bdbed3591519e4e3e51c10de7fa6001375e"
+    }
+  ]
+}
