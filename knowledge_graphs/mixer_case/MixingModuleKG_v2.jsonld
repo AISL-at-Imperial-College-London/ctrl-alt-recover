@@ -766,22 +766,6 @@
                 ]
             },
             {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Object",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "Generic node in an OpenMath object list; can represent a number, variable, or nested application."
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#label": [
-                    {
-                        "@value": "Object"
-                    }
-                ]
-            },
-            {
                 "@id": "http://www.hsu-ifa.de/ontologies/UMLStateMachine#State",
                 "@type": [
                     "http://www.w3.org/2002/07/owl#Class"
@@ -1261,59 +1245,6 @@
                 "http://www.w3.org/2000/01/rdf-schema#comment": [
                     {
                         "@value": "Used for decomposition. A process operator can be composed of multiple more detailed process operators."
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Operator",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "Represents an OpenMath operator (e.g., plus, sin, times, etc.)."
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#label": [
-                    {
-                        "@value": "Operator"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#ObjectList",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "Linked list of OM:Object instances, representing the argument list of an application."
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#label": [
-                    {
-                        "@value": "ObjectList"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Application",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI2206#MathematicalModel"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "An application of an OM:Operator to an OM:ObjectList (the core OpenMath construct)."
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#label": [
-                    {
-                        "@value": "Application"
                     }
                 ]
             },
@@ -2093,38 +2024,6 @@
                 "http://www.hsu-ifa.de/ontologies/CPSMod#isDataFor": [
                     {
                         "@id": "http://example.org/mixer#act_open_valve_in0"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#isDataFor",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/DINEN61360#Data_Element"
-                    },
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/DINEN61360#Data_Element"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b42"
-                    },
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b43"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@language": "en",
-                        "@value": "\n        Links a data element to an OpenMath Object, a UML state, or a UML transition.\n    "
-                    },
-                    {
-                        "@language": "en",
-                        "@value": "\n        Links a data element to an OpenMath Object, a UML state, or a UML event.\n    "
                     }
                 ]
             },
@@ -6900,31 +6799,6 @@
                 ]
             },
             {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#isChangedByActuator",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI3682#State"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b44"
-                    },
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b45"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@language": "en",
-                        "@value": "\n            Links a system, material, energy or information state, to the actuator that causes its change.\n        "
-                    }
-                ]
-            },
-            {
                 "@id": "http://example.org/mixer#valve_in0",
                 "@type": [
                     "http://www.w3id.org/hsu-aut/VDI2206#Actuator"
@@ -7472,31 +7346,6 @@
                 "http://www.hsu-ifa.de/ontologies/CPSMod#isObservedBySensor": [
                     {
                         "@id": "http://example.org/mixer#sensor_continuous_pressure_tank_B201"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#isObservedBySensor",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI3682#State"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b46"
-                    },
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b47"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@language": "en",
-                        "@value": "\n            Links a system, material, energy or information state to the sensor that observes or measures it.\n        "
                     }
                 ]
             },
@@ -8814,28 +8663,6 @@
                 ]
             },
             {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#describesSystemModel",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/DIN77005#InformationSet"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#SystemModel"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@language": "en",
-                        "@value": "\n            Links a Information Set from the lifecycle Record to the System Model it describes.\n        "
-                    }
-                ]
-            },
-            {
                 "@id": "http://example.org/mixer#mixerModuleSystemModel1234",
                 "@type": [
                     "http://www.hsu-ifa.de/ontologies/CPSMod#SystemModel"
@@ -8853,17 +8680,6 @@
                 "http://www.hsu-ifa.de/ontologies/CPSMod#consistsOfStructureModel": [
                     {
                         "@id": "http://example.org/mixer#mixerModule1234"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#SystemModel",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "A model that describes different aspects of a system. For technical systems (e.g., mechatronic systems), it encompasses aspects of the cyber-physical system’s functions respectively process operators, structure, and behavior."
                     }
                 ]
             },
@@ -8915,38 +8731,6 @@
                 ]
             },
             {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#consistsOfBehaviorModel",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#SystemModel"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI2206#MathematicalModel"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#consistsOfFunctionModel",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#SystemModel"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI3682#Process"
-                    }
-                ]
-            },
-            {
                 "@id": "http://example.org/mixer#mixingProcess1234",
                 "@type": [
                     "http://www.w3id.org/hsu-aut/VDI3682#Process"
@@ -8954,22 +8738,6 @@
                 "http://www.w3id.org/hsu-aut/VDI3682#consistsOf": [
                     {
                         "@id": "http://example.org/mixer#mixing1234"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#consistsOfStructureModel",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#SystemModel"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI3682#TechnicalResource"
                     }
                 ]
             },
@@ -9100,25 +8868,6 @@
                 "http://www.w3id.org/hsu-aut/VDI3682#processOperatorRealizes": [
                     {
                         "@id": "http://example.org/mixer#MixerStateMachine"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#processRealizesBehavior",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b40"
-                    },
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b41"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.w3id.org/hsu-aut/VDI2206#MathematicalModel"
                     }
                 ]
             },
@@ -9354,22 +9103,6 @@
                 ]
             },
             {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Ontology"
-                ],
-                "http://www.w3.org/2002/07/owl#versionIRI": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#/1.0.0"
-                    }
-                ],
-                "http://www.w3.org/2002/07/owl#versionInfo": [
-                    {
-                        "@value": "1.0.0"
-                    }
-                ]
-            },
-            {
                 "@id": "http://www.w3id.org/hsu-aut/VDI2206#MathematicalModel",
                 "@type": [
                     "http://www.w3.org/2002/07/owl#Class"
@@ -9382,31 +9115,6 @@
                 "http://www.w3.org/2000/01/rdf-schema#label": [
                     {
                         "@value": "Mathematical Model"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/CPSMod#isAssignedToAsset",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/DIN77005#LifeCycleRecord"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b48"
-                    },
-                    {
-                        "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b49"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@language": "en",
-                        "@value": "\n            Links a lifecycle record (e.g., a model) to the technical resource, asset, mechatronic system, module or component it describes.\n        "
                     }
                 ]
             },
@@ -10055,69 +9763,6 @@
                 "http://www.w3.org/2000/01/rdf-schema#comment": [
                     {
                         "@value": "Description:\nObjectProperty is used to connect a Type_Description with a Data_Element that has instace descriptions of this type. \n\nInverse of has_Type_Description"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Ontology"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "OpenMath.owl – Core classes and object properties for OpenMath structures."
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#arguments",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Application"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#ObjectList"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "Links an OpenMath Application to its ObjectList of arguments."
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#label": [
-                    {
-                        "@value": "arguments"
-                    }
-                ]
-            },
-            {
-                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#operator",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#ObjectProperty"
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#domain": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Application"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#range": [
-                    {
-                        "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Operator"
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#comment": [
-                    {
-                        "@value": "Links an OpenMath Application to its Operator."
-                    }
-                ],
-                "http://www.w3.org/2000/01/rdf-schema#label": [
-                    {
-                        "@value": "operator"
                     }
                 ]
             },
@@ -12586,195 +12231,6 @@
                 ]
             },
             {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b40",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI3682#Process"
-                            },
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI3682#ProcessOperator"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b41",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI3682#Process"
-                            },
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI3682#ProcessOperator"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b42",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Object"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b43",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Object"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/UMLStateMachine#Event"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/UMLStateMachine#Action"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b44",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI2206#Actuator"
-                            },
-                            {
-                                "@id": "http://www.w3.org/ns/sosa/Actuator"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b45",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI2206#Actuator"
-                            },
-                            {
-                                "@id": "http://www.w3.org/ns/sosa/Actuator"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b46",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI2206#Sensor"
-                            },
-                            {
-                                "@id": "http://www.w3.org/ns/sosa/Sensor"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b47",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI2206#Sensor"
-                            },
-                            {
-                                "@id": "http://www.w3.org/ns/sosa/Sensor"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b48",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI2206#BasicSystem"
-                            },
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI3682#TechnicalResource"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b49",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#Class"
-                ],
-                "http://www.w3.org/2002/07/owl#unionOf": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI2206#BasicSystem"
-                            },
-                            {
-                                "@id": "http://www.w3id.org/hsu-aut/VDI3682#TechnicalResource"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
                 "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b5",
                 "@type": [
                     "http://www.w3.org/2002/07/owl#Class"
@@ -13456,30 +12912,6 @@
                             },
                             {
                                 "@id": "http://www.w3id.org/hsu-aut/VDI2206#System"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "@id": "_:genid-a980084a203a495f9048ababc1c700d721566-b89",
-                "@type": [
-                    "http://www.w3.org/2002/07/owl#AllDisjointClasses"
-                ],
-                "http://www.w3.org/2002/07/owl#members": [
-                    {
-                        "@list": [
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Operator"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Object"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#ObjectList"
-                            },
-                            {
-                                "@id": "http://www.hsu-ifa.de/ontologies/OpenMath#Application"
                             }
                         ]
                     }
