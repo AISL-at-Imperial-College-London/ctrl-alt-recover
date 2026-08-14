@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.hsu-ifa.de/ontologies/UMLStateMachine#"
+     xml:base="http://www.hsu-ifa.de/ontologies/UMLStateMachine"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  
+  <owl:Ontology rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine">
+    <owl:versionIRI rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine/1.0.0"/>
+    <owl:versionInfo>1.0.0</owl:versionInfo>
+    <rdfs:comment xml:lang="en">
+      Lightweight UML StateMachine ontology to describe discrete behavioral models.
+    </rdfs:comment>
+  </owl:Ontology>
+
+  <!-- =================================================================================== -->
+  <!-- Object Properties                                                                       -->
+  <!-- =================================================================================== -->
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#containsState">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#StateMachine"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:comment   xml:lang="en">Associates a StateMachine with its States.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#containsTransition">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#StateMachine"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"/>
+    <rdfs:comment   xml:lang="en">Associates a StateMachine with its Transitions.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#transitionEvent">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Event"/>
+    <rdfs:comment   xml:lang="en">Specifies the Event triggering a Transition.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#sourceState">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:comment   xml:lang="en">Denotes the source State of a Transition.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#targetState">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:comment   xml:lang="en">Denotes the target State of a Transition.</rdfs:comment>
+  </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#entryAction">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Action"/>
+    <rdfs:comment   xml:lang="en">Action executed upon entering the State.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#doAction">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Action"/>
+    <rdfs:comment   xml:lang="en">Action executed while the State remains active.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#exitAction">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Action"/>
+    <rdfs:comment   xml:lang="en">Action executed upon exiting the State.</rdfs:comment>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#effect">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"/>
+    <rdfs:range     rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Action"/>
+    <rdfs:comment   xml:lang="en">Action executed when the Transition fires.</rdfs:comment>
+  </owl:ObjectProperty>
+
+
+  <!-- =================================================================================== -->
+  <!-- Datatype Properties                                                                    -->
+  <!-- =================================================================================== -->
+
+  <owl:DatatypeProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#stateName">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State"/>
+    <rdfs:range     rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment   xml:lang="en">Human-readable name of the State.</rdfs:comment>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#transitionGuard">
+    <rdfs:domain    rdf:resource="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition"/>
+    <rdfs:range     rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment   xml:lang="en">Guard condition of the Transition, if any.</rdfs:comment>
+  </owl:DatatypeProperty>
+
+  <!-- =================================================================================== -->
+  <!-- Classes                                                                                -->
+  <!-- =================================================================================== -->
+
+  <owl:Class rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#StateMachine">
+    <rdfs:label    xml:lang="en">State Machine</rdfs:label>
+    <rdfs:comment  xml:lang="en">Abstract model defining States and Transitions.</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#State">
+    <rdfs:label    xml:lang="en">State</rdfs:label>
+    <rdfs:comment  xml:lang="en">A distinct condition or situation of the system.</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Transition">
+    <rdfs:label    xml:lang="en">Transition</rdfs:label>
+    <rdfs:comment  xml:lang="en">Change from one State to another, possibly triggered by an Event.</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Event">
+    <rdfs:label    xml:lang="en">Event</rdfs:label>
+    <rdfs:comment  xml:lang="en">Occurrence that may trigger a Transition.</rdfs:comment>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://www.hsu-ifa.de/ontologies/UMLStateMachine#Action">
+    <rdfs:label    xml:lang="en">Action</rdfs:label>
+    <rdfs:comment  xml:lang="en">An operation executed on entry, during, or exit of a State, or as effect of a Transition.</rdfs:comment>
+  </owl:Class>
+
+</rdf:RDF>
