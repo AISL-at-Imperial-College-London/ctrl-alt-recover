@@ -60,7 +60,7 @@ CONSTRUCT {
      rdfs:label ?aL .
 }
 WHERE {
-  GRAPH <http://www.hsu-ifa.de/graphs/mixerModuleImperial> {
+  GRAPH <http://www.hsu-ifa.de/graphs/mixerModuleImperial_new> {
     # --- Seed ---
     :mixerModule1234 a VDI2206:Module .
     :mixing1234 a VDI3682:ProcessOperator ;
@@ -137,7 +137,7 @@ CONSTRUCT {
             :localName ?actuator_id .
 }
 WHERE {
-  GRAPH <http://www.hsu-ifa.de/graphs/mixerModuleImperial> {
+  GRAPH <http://www.hsu-ifa.de/graphs/mixerModuleImperial_new> {
 
     # Seed
     :mixerModule1234 a VDI2206:Module .
