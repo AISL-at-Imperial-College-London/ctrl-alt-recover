@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+title: "From detection to action: Using LLM agents for Fault-Tolerant Control"
+message: "If you use this software or method in your research, please cite it as below."
+type: software
+authors:
+  - family-names: Vyas
+    given-names: Javal
+  - family-names: Gill
+    given-names: Milapji Singh
+  - family-names: Markaj
+    given-names: Artan
+  - family-names: Gehlhoff
+    given-names: Felix
+  - family-names: Mercangöz
+    given-names: Mehmet
+repository-code: "https://github.com/AISL-at-Imperial-College-London/ctrl-alt-recover"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Vyas
+      given-names: Javal
+    - family-names: Gill
+      given-names: Milapji Singh
+    - family-names: Markaj
+      given-names: Artan
+    - family-names: Gehlhoff
+      given-names: Felix
+    - family-names: Mercangöz
+      given-names: Mehmet
+  title: "From detection to action: Using LLM agents for Fault-Tolerant Control"
+  journal: "Journal of Process Control"
+  volume: 167
+  pages: 103855
+  year: 2026
+  issn: "0959-1524"
+  doi: "10.1016/j.jprocont.2026.103855"
+  url: "https://www.sciencedirect.com/science/article/pii/S0959152426002386"
