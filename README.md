@@ -536,12 +536,14 @@ and whether the run used OpenAI or Ollama-backed models.
 If you use this codebase or reference our work in your research, please cite it as follows:
 
 ```bibtex
-@misc{vyas2026detectionactionusingllm,
-      title={From Detection to Action: Using LLM Agents for Fault-Tolerant Control}, 
-      author={Javal Vyas and Milapji Singh Gill and Artan Markaj and Felix Gehlhoff and Mehmet Mercangöz},
-      year={2026},
-      eprint={2606.28011},
-      archivePrefix={arXiv},
-      primaryClass={eess.SY},
-      url={https://arxiv.org/abs/2606.28011}, 
-}
+@article{VYAS2026103855,
+title = {From detection to action: Using LLM agents for Fault-Tolerant Control},
+journal = {Journal of Process Control},
+volume = {167},
+pages = {103855},
+year = {2026},
+issn = {0959-1524},
+doi = {https://doi.org/10.1016/j.jprocont.2026.103855},
+url = {https://www.sciencedirect.com/science/article/pii/S0959152426002386},
+author = {Javal Vyas and Milapji Singh Gill and Artan Markaj and Felix Gehlhoff and Mehmet Mercangöz},
+keywords = {Process control, Fault-Tolerant Control, Process plants, Large language models, Artificial Intelligence, Knowledge graphs, Graph RAG, Digital twin}
