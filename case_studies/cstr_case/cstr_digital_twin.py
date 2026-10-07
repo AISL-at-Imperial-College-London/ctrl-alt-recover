@@ -61,10 +61,21 @@ class FaultConfig:
     k_over: float = 0.05
 
 
+def _randn(rng: Optional[np.random.RandomState]) -> float:
+    """Standard normal draw from rng, or from NumPy's global stream if rng is None."""
+    return (np.random if rng is None else rng).randn()
+
+
 class FaultManager:
-    def __init__(self, cfg: FaultConfig, UA_nominal: float):
+    def __init__(
+        self,
+        cfg: FaultConfig,
+        UA_nominal: float,
+        rng: Optional[np.random.RandomState] = None,
+    ):
         self.cfg = cfg
         self.UA_nominal = UA_nominal
+        self.rng = rng
 
     def UA_eff(self, t: float) -> float:
         c = self.cfg
@@ -75,7 +86,7 @@ class FaultManager:
         return self.UA_nominal * (1.0 - np.clip(frac, 0.0, 0.95))
 
     def sensor_T(self, t: float, T_true: float, noise_std: float) -> float:
-        T_meas = T_true + noise_std * np.random.randn()
+        T_meas = T_true + noise_std * _randn(self.rng)
         c = self.cfg
         if c.enable and c.temp_bias_on and t >= c.temp_bias_t:
             T_meas += c.temp_bias_K
@@ -275,9 +286,15 @@ class CSTRSimulation:
         flow_meas_noise_pct: float = 0.02,
         sensor_T_noise_std: float = 0.5,
         seed: Optional[int] = 42,
+        isolated_rng: bool = False,
         fault_cfg: Optional[FaultConfig] = None,
     ):
-        if seed is not None:
+        # Noise source. By default the simulator seeds and draws from NumPy's
+        # global stream, so a deep-copied twin consumes noise the plant would
+        # otherwise see. isolated_rng=True gives this instance its own
+        # RandomState: a deep copy then replays the plant's noise exactly.
+        self.rng = np.random.RandomState(seed) if isolated_rng else None
+        if not isolated_rng and seed is not None:
             np.random.seed(seed)
 
         # time config
@@ -314,7 +331,7 @@ class CSTRSimulation:
         self.fault_cfg = (
             fault_cfg if fault_cfg is not None else FaultConfig(enable=False)
         )
-        self.faults = FaultManager(self.fault_cfg, UA_nominal=self.UA)
+        self.faults = FaultManager(self.fault_cfg, UA_nominal=self.UA, rng=self.rng)
 
         # actuators + controllers (internal stateful)
         self.valve_in = Valve()
@@ -394,7 +411,7 @@ class CSTRSimulation:
 
             Fin_meas = self.valve_in.flow()
             Fin_meas_noisy = Fin_meas * (
-                1 + self.flow_meas_noise_pct * np.random.randn()
+                1 + self.flow_meas_noise_pct * _randn(self.rng)
             )
             valve_cmd = self.pid_flow.step(Fin_sp, Fin_meas_noisy, self.dt)
 
@@ -407,7 +424,7 @@ class CSTRSimulation:
 
             Fin_meas = self.valve_in.flow()
             Fin_meas_noisy = Fin_meas * (
-                1 + self.flow_meas_noise_pct * np.random.randn()
+                1 + self.flow_meas_noise_pct * _randn(self.rng)
             )
             valve_cmd = self.pid_flow.step(Fin_sp, Fin_meas_noisy, self.dt)
 
@@ -472,9 +489,9 @@ class CSTRSimulation:
         F_over = self.faults.overflow_flow(V)
 
         # inlet conditions (noisy)
-        CA_in = self.CA_in_base * (1 + self.conc_noise_pct * np.random.randn())
-        CD_in = self.CD_in_base * (1 + self.conc_noise_pct * np.random.randn())
-        Tin = self.Tin_base * (1 + self.conc_noise_pct * np.random.randn())
+        CA_in = self.CA_in_base * (1 + self.conc_noise_pct * _randn(self.rng))
+        CD_in = self.CD_in_base * (1 + self.conc_noise_pct * _randn(self.rng))
+        Tin = self.Tin_base * (1 + self.conc_noise_pct * _randn(self.rng))
         Tc = self.Tc_base
 
         UA_eff = self.faults.UA_eff(self.t)
