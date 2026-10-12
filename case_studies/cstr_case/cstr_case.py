@@ -439,6 +439,9 @@ class GraphState(TypedDict, total=False):
     fault_name: str
     fault_cfg: FaultConfig
 
+    # plant noise: True gives the plant its own RNG (see CSTRSimulation)
+    isolated_rng: bool
+
     # monitoring outputs
     fault_flag: bool
     fault_flag_prev: bool
@@ -884,6 +887,7 @@ def initializing(state: GraphState) -> GraphState:
         Fin_sp_normal=state["Fin_sp_normal"],
         Fin_sp_startup=state["Fin_sp_startup"],
         fault_cfg=state["fault_cfg"],
+        isolated_rng=bool(state.get("isolated_rng", False)),
     )
 
     # safety checkers
@@ -2194,6 +2198,7 @@ def run_single_experiment_cstr(
         ),
         "llm_model": args.llm_model,
         "reprompt_max": args.reprompt_max,
+        "isolated_rng": bool(getattr(args, "isolated_rng", False)),
     }
 
     if verbose:
@@ -2587,6 +2592,13 @@ def main():
 
     parser.add_argument("--llm-model", type=str, default="gpt-4o-mini")
     parser.add_argument("--reprompt-max", type=int, default=5)
+
+    parser.add_argument(
+        "--isolated-rng",
+        action="store_true",
+        help="Give the plant its own seeded RNG so digital-twin rollouts replay "
+        "its noise exactly (default: shared NumPy global stream)",
+    )
 
     parser.add_argument(
         "--plot",
