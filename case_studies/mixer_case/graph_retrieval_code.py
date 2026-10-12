@@ -6,7 +6,6 @@ import sys
 
 from textwrap import dedent
 
-
 # GraphDB SPARQL endpoint (adjust repository if needed)
 
 ENDPOINT = "http://localhost:7200/repositories/MixingModuleExample"
@@ -14,8 +13,7 @@ ENDPOINT = "http://localhost:7200/repositories/MixingModuleExample"
 
 # SPARQL CONSTRUCT query
 
-QUERY_PLANNING = dedent(
-    """
+QUERY_PLANNING = dedent("""
 PREFIX :        <http://example.org/mixer#>
 PREFIX UML:     <http://www.hsu-ifa.de/ontologies/UMLStateMachine#>
 PREFIX VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#>
@@ -99,12 +97,10 @@ WHERE {
     }
   }
 }
-"""
-).strip()
+""").strip()
 
 
-QUERY_ACTION = dedent(
-    """
+QUERY_ACTION = dedent("""
 PREFIX :        <http://example.org/mixer#>
 PREFIX UML:     <http://www.hsu-ifa.de/ontologies/UMLStateMachine#>
 PREFIX VDI2206: <http://www.w3id.org/hsu-aut/VDI2206#>
@@ -174,11 +170,9 @@ WHERE {
     }
   }
 }
-"""
-).strip()
+""").strip()
 
-QUERY_CSTR = dedent(
-    """
+QUERY_CSTR = dedent("""
               # ****************************************************************************
 #
 #   QUERY 1: CSTR PROCESS OVERVIEW (CONSTRUCT)
@@ -375,8 +369,7 @@ WHERE {
 # :controller_PID_T rdf:type VDI2206:InformationProcessing .
 #
 # ============================================================================
-"""
-).strip()
+""").strip()
 
 
 def run_construct(query: str) -> str:

@@ -17,7 +17,6 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TRACE_ROOT = REPO_ROOT / "traces" / "cstr"
 
@@ -148,9 +147,7 @@ class CstrDashboard:
             plt.style.use("seaborn-v0_8-darkgrid")
         except OSError:
             pass
-        self.fig, grid = plt.subplots(
-            3, 2, figsize=(15, 10), constrained_layout=True
-        )
+        self.fig, grid = plt.subplots(3, 2, figsize=(15, 10), constrained_layout=True)
         self.temp_ax = grid[0, 0]
         self.level_ax = grid[0, 1]
         self.flow_ax = grid[1, 0]
@@ -175,9 +172,7 @@ class CstrDashboard:
         self.run_dir = candidate
         self.metadata = _read_metadata(candidate)
         self.plant_tail = JsonlTail(candidate / "live" / "cstr_plant.jsonl")
-        self.validation_tail = JsonlTail(
-            candidate / "live" / "cstr_validation.jsonl"
-        )
+        self.validation_tail = JsonlTail(candidate / "live" / "cstr_validation.jsonl")
         self.events_tail = JsonlTail(candidate / "events.jsonl")
         self.plant_rows = []
         self.validation_rows = []
@@ -188,9 +183,7 @@ class CstrDashboard:
         if self.run_dir is None:
             return
         new_plant = self.plant_tail.read_new() if self.plant_tail else []
-        new_validation = (
-            self.validation_tail.read_new() if self.validation_tail else []
-        )
+        new_validation = self.validation_tail.read_new() if self.validation_tail else []
         new_events = self.events_tail.read_new() if self.events_tail else []
         self.plant_rows.extend(new_plant)
         self.validation_rows.extend(new_validation)

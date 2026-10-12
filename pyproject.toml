@@ -1,0 +1,32 @@
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.pylint.main]
+py-version = "3.10"
+persistent = false
+init-hook = "import sys; sys.path[:0] = ['case_studies', 'case_studies/cstr_case', 'case_studies/mixer_case']"
+
+# Start with correctness checks for the existing research scripts. Style is
+# enforced by Black. Optional LLM and external mixer imports are not in CI.
+[tool.pylint.messages_control]
+disable = ["all"]
+enable = ["E", "F"]
+
+[tool.pylint.typecheck]
+ignored-modules = ["langgraph", "langchain", "langchain_openai", "langchain_ollama", "dotenv", "pydantic", "pandas", "matplotlib", "mixer_module"]
+# NumPy's compiled legacy RNG is invisible to Astroid on some versions.
+generated-members = [".*RandomState"]
+
+[tool.pytest.ini_options]
+testpaths = ["case_studies/cstr_case"]
+python_files = ["test_*.py"]
+pythonpath = ["case_studies", "case_studies/cstr_case"]
+
+[tool.coverage.run]
+source = ["case_studies/common", "case_studies/cstr_case", "case_studies/mixer_case"]
+omit = ["*/test_*.py"]
+relative_files = true
+
+[tool.coverage.report]
+show_missing = true

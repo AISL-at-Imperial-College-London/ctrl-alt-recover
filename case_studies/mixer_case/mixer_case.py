@@ -28,7 +28,12 @@ from simulation import Simulation
 # =============================================================================
 
 try:
-    from graph_retrieval_code import ENDPOINT, run_construct, QUERY_PLANNING, QUERY_ACTION
+    from graph_retrieval_code import (
+        ENDPOINT,
+        run_construct,
+        QUERY_PLANNING,
+        QUERY_ACTION,
+    )
 
     SPARQL_AVAILABLE = True
 except ImportError:
@@ -828,9 +833,7 @@ The UML:StateMachine shows that state_filling_tank_B203 has transitions to multi
 Reasoning: B203 full, sensor_fault doesn't affect pump operation.
 """
 
-ACTION_SYSTEM_PROMPT_NORMAL = (
-    ONTOLOGY_CONTEXT
-    + """
+ACTION_SYSTEM_PROMPT_NORMAL = ONTOLOGY_CONTEXT + """
 
 ## ACTION TASK
 
@@ -841,7 +844,6 @@ Task: Based on the target state from the planning agent, query the Knowledge Gra
 Only(!!!) use the actuator (VDI2206) which are connected to the TARGET STATE provided by the planning agent before via the chain UML:State -> UML:doAction -> UML:Action -> CPSMod:isChangedByActuator.!!! Even if you have potentially other ideas, stick with the version in the KG (ttl.file). Thise actuators are always 1 (on), not 0(closed)!
 
 """
-)
 
 ACTION_FEW_SHOT_NORMAL = """\
 ## EXAMPLES
@@ -856,13 +858,9 @@ Actions: [{"actuator": "valve_in_B202", "value": 1}]
 
 # --- LEVEL: MINIMAL (only ONTOLOGY_CONTEXT + Valid States, no examples) ---
 
-PLANNING_SYSTEM_PROMPT_MINIMAL = (
-    ONTOLOGY_CONTEXT
-    + """
+PLANNING_SYSTEM_PROMPT_MINIMAL = ONTOLOGY_CONTEXT + """
 
-"""
-    + VALID_STATES_STR
-)
+""" + VALID_STATES_STR
 
 PLANNING_FEW_SHOT_MINIMAL = ""  # No examples
 
