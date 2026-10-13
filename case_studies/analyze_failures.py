@@ -82,8 +82,7 @@ class FailureDiagnosis(BaseModel):
     )
 
 
-SYSTEM_PROMPT = dedent(
-    """
+SYSTEM_PROMPT = dedent("""
     You are a failure-analysis assistant for LLM-controlled process-safety
     case studies (a CSTR reactor, and a tank-mixer sequencing system). A
     smaller model - often a local model such as llama3:8b or qwen3:8b - was
@@ -109,8 +108,7 @@ SYSTEM_PROMPT = dedent(
     (server unreachable / too slow) rather than a model-quality issue.
 
     Return STRICT JSON matching the given schema only.
-    """
-).strip()
+    """).strip()
 
 
 # =============================================================================
