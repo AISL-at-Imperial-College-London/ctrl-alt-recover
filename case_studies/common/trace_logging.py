@@ -215,6 +215,7 @@ class TraceRecorder:
         rationale: Optional[str],
         usage: Optional[Mapping[str, Any]],
         latency_seconds: float,
+        failure_type: Optional[str] = None,
     ) -> None:
         self._llm_call += 1
         stem = f"call_{self._llm_call:04d}_{_safe_name(agent)}_iteration_{int(iteration):04d}"
@@ -232,6 +233,7 @@ class TraceRecorder:
                 "agent_provided_rationale": rationale,
                 "usage": usage or {},
                 "latency_seconds": latency_seconds,
+                "failure_type": failure_type,
             },
         )
         self.record_event(
@@ -241,6 +243,7 @@ class TraceRecorder:
             rationale=rationale,
             usage=usage or {},
             latency_seconds=latency_seconds,
+            failure_type=failure_type,
             prompt_artifact=prompt_artifact,
             response_artifact=response_artifact,
         )

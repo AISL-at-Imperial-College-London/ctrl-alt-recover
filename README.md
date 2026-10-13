@@ -2,7 +2,12 @@
 
 [![CI](https://github.com/AISL-at-Imperial-College-London/ctrl-alt-recover/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AISL-at-Imperial-College-London/ctrl-alt-recover/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/AISL-at-Imperial-College-London/ctrl-alt-recover/branch/main/graph/badge.svg)](https://codecov.io/gh/AISL-at-Imperial-College-London/ctrl-alt-recover)
+[![Python 3.10 | 3.13](https://img.shields.io/badge/python-3.10%20%7C%203.13-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+[![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.jprocont.2026.103855-blue.svg)](https://doi.org/10.1016/j.jprocont.2026.103855)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen.svg)](https://github.com/pylint-dev/pylint)
+[![Built with LangGraph](https://img.shields.io/badge/built%20with-LangGraph-1C3C3C.svg)](https://github.com/langchain-ai/langgraph)
 
 **From detection to action: LLM agents for fault-tolerant control**
 
@@ -222,13 +227,16 @@ Install the CI dependencies and run the same checks locally:
 
 ```bash
 python -m pip install -r requirements-ci.txt
-python -m black case_studies
+python -m black case_studies tests
 python -m pylint case_studies/common case_studies/cstr_case/*.py case_studies/mixer_case/*.py
 python -m pytest --cov --cov-report=term-missing --cov-report=xml
 ```
 
 GitHub Actions checks formatting and Pylint correctness diagnostics, and runs
-the offline CSTR RNG regression tests on Python 3.10 and 3.13. Pylint excludes
+the offline test suite in `tests/` (plus the CSTR RNG regression tests) on
+Python 3.10 and 3.13. The tests drive both recovery loops with scripted LLM
+replies; `tests/conftest.py` substitutes minimal stand-ins for LangGraph,
+LangChain and python-dotenv when they are not installed. Pylint excludes
 optional LLM, plotting, and external mixer dependencies from import analysis.
 CI does not need API keys, GraphDB, or the external mixer simulator. Coverage
 includes all case-study source files, so untested experiment scripts remain

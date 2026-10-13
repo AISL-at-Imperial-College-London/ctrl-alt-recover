@@ -42,6 +42,12 @@ if str(CASE_STUDIES_ROOT) not in sys.path:
     sys.path.insert(0, str(CASE_STUDIES_ROOT))
 
 from common.trace_logging import TraceRecorder
+from common.llm_failures import (
+    LLMActionError,
+    classify_exception,
+    failure_type_of,
+    SCHEMA_VALIDATION_ERROR,
+)
 
 try:
     from graph_retrieval_code import ENDPOINT, QUERY_CSTR, run_construct
@@ -152,16 +158,21 @@ def is_kg_loaded() -> bool:
 # =============================================================================
 
 
-def _make_llm(model: str = "llama3:8b", temperature: float = 0.0):
+def _make_llm(model: str = "llama3:8b", temperature: float = 0.0, timeout: float = 120.0):
     """
     Uses OpenAI if model starts with 'gpt', else Ollama.
+
+    timeout defaults to 120s rather than the previous 60s: CPU-bound local
+    models (llama3:8b, qwen3:8b, ...) can genuinely take longer than 60s per
+    call, and a too-short timeout shows up as a misleading `timeout`
+    failure_type rather than a real reasoning failure.
     """
     if model.startswith("gpt"):
-        return ChatOpenAI(model=model, temperature=temperature, timeout=60)
+        return ChatOpenAI(model=model, temperature=temperature, timeout=timeout)
     return ChatOllama(
         model=model,
         temperature=temperature,
-        timeout=60,
+        timeout=timeout,
         base_url="http://localhost:11434",
     )
 
@@ -1245,13 +1256,21 @@ def action_propose(state: GraphState) -> GraphState:
         Previous proposal: {prev_prop}
         2) Goal: reach SAFE and HOLD SAFE for at least {state.get("safe_hold_seconds", 60.0)} seconds in the digital-twin rollout.
         3) If u_cool/u_valve/u_pump is near saturation (>=0.95) or trending upward, temperature must stay close to 310 K.
-        4) Setpoints can only be change in increments of 0.05 for T_sp and L_sp, and 0.005 for Fin_sp only.
+        4) Setpoints must land on a grid of multiples of 0.05 for T_sp and L_sp, and multiples of 0.005
+        for Fin_sp (e.g. a change of 0.05, 0.10, 0.15, 0.20 K... is allowed). You are NOT limited to a
+        single grid step per attempt - if the snapshot or evaluation feedback shows the fault persists,
+        you may move by several multiples at once in one proposal.
         Now propose setpoints. Return ONLY JSON (no markdown).
         """
 
     llm_model = str(state.get("llm_model", "gpt-4o-mini"))
-    llm = _make_llm(model=llm_model, temperature=0.0)
+    llm_timeout = float(state.get("llm_timeout", 120.0))
+    llm = _make_llm(model=llm_model, temperature=0.0, timeout=llm_timeout)
     plan = None
+    raw: Any = None
+    raw_for_trace: Any = None
+    failure_type: Optional[str] = None
+    failure_detail: str = ""
 
     # ----- metrics locals -----
     prompt_tokens = 0
@@ -1259,48 +1278,62 @@ def action_propose(state: GraphState) -> GraphState:
     total_tokens = 0
     t_start = time.perf_counter()
 
-    # structured output if available
-    try:
-        plan_llm = llm.with_structured_output(SetpointPlan, include_raw=True)
-
+    def _invoke(target) -> Any:
+        nonlocal prompt_tokens, completion_tokens, total_tokens
         # tokens only reliable for OpenAI gpt-* with callback
         if llm_model.startswith("gpt"):
             with get_openai_callback() as cb:
-                raw = plan_llm.invoke(
+                result = target.invoke(
                     [("system", ACTION_SYSTEM_PROMPT_KG), ("user", user_prompt)]
                 )
                 prompt_tokens = int(getattr(cb, "prompt_tokens", 0) or 0)
                 completion_tokens = int(getattr(cb, "completion_tokens", 0) or 0)
                 total_tokens = int(getattr(cb, "total_tokens", 0) or 0)
-        else:
-            raw = plan_llm.invoke(
-                [("system", ACTION_SYSTEM_PROMPT_KG), ("user", user_prompt)]
-            )
+                return result
+        return target.invoke(
+            [("system", ACTION_SYSTEM_PROMPT_KG), ("user", user_prompt)]
+        )
 
-    except Exception as e:
-        if llm_model.startswith("gpt"):
-            with get_openai_callback() as cb:
-                raw = llm.invoke(
-                    [("system", ACTION_SYSTEM_PROMPT_KG), ("user", user_prompt)]
-                )
-                prompt_tokens = int(getattr(cb, "prompt_tokens", 0) or 0)
-                completion_tokens = int(getattr(cb, "completion_tokens", 0) or 0)
-                total_tokens = int(getattr(cb, "total_tokens", 0) or 0)
-        else:
-            raw = llm.invoke(
-                [("system", ACTION_SYSTEM_PROMPT_KG), ("user", user_prompt)]
-            )
-
+    # Structured output if available. Local models often can't do this
+    # reliably, so we fall back to a plain invoke + manual JSON parse -
+    # and classify *why* it failed if even that doesn't produce a plan.
+    try:
+        plan_llm = llm.with_structured_output(SetpointPlan, include_raw=True)
+        raw = _invoke(plan_llm)
+    except Exception as structured_exc:
         try:
-            obj = json.loads(getattr(raw, "content", raw))
-            plan = SetpointPlan(**obj)
-        except Exception:
-            raise RuntimeError(f"LLM output parse failed. Original error: {e}")
+            raw = _invoke(llm)
+        except Exception as connect_exc:
+            failure_type = classify_exception(connect_exc)
+            failure_detail = (
+                f"structured_output_error={structured_exc}; "
+                f"plain_invoke_error={connect_exc}"
+            )
+            raw_for_trace = {
+                "structured_output_error": str(structured_exc),
+                "plain_invoke_error": str(connect_exc),
+            }
+        else:
+            raw_for_trace = getattr(raw, "content", raw)
+            try:
+                obj = json.loads(raw_for_trace)
+                plan = SetpointPlan(**obj)
+            except Exception as parse_exc:
+                failure_type = classify_exception(parse_exc)
+                failure_detail = (
+                    f"structured_output_error={structured_exc}; "
+                    f"json_parse_error={parse_exc}"
+                )
 
-    if isinstance(raw, dict) and raw.get("parsed") is not None:
-        plan = raw["parsed"]
-    if plan is None:
-        raise RuntimeError("LLM output did not contain a parsed setpoint plan")
+    if failure_type is None:
+        if isinstance(raw, dict) and raw.get("parsed") is not None:
+            plan = raw["parsed"]
+        if plan is None:
+            failure_type = SCHEMA_VALIDATION_ERROR
+            failure_detail = "LLM output did not contain a parsed setpoint plan"
+            if raw_for_trace is None:
+                raw_for_trace = raw.get("raw") if isinstance(raw, dict) else raw
+
     latency_s = time.perf_counter() - t_start
 
     # ----- update state counters (no logic change) -----
@@ -1336,7 +1369,11 @@ def action_propose(state: GraphState) -> GraphState:
                 {"role": "system", "content": ACTION_SYSTEM_PROMPT_KG},
                 {"role": "user", "content": user_prompt},
             ],
-            raw_response=raw.get("raw") if isinstance(raw, dict) else raw,
+            raw_response=(
+                raw_for_trace
+                if failure_type is not None
+                else (raw.get("raw") if isinstance(raw, dict) else raw)
+            ),
             parsed_response=plan,
             rationale=getattr(plan, "reasoning", ""),
             usage={
@@ -1345,6 +1382,16 @@ def action_propose(state: GraphState) -> GraphState:
                 "total_tokens": total_tokens,
             },
             latency_seconds=latency_s,
+            failure_type=failure_type,
+        )
+
+    if failure_type is not None:
+        print(f"  [ACTION_PROPOSE] FAILED type={failure_type}: {failure_detail}")
+        raise LLMActionError(
+            failure_type,
+            f"LLM action-propose call failed ({failure_type}) for model="
+            f"{llm_model}: {failure_detail}",
+            raw_response=raw_for_trace,
         )
 
     proposed = {
@@ -2230,7 +2277,11 @@ def run_single_experiment_cstr(
         if recorder is not None:
             recorder.finalize(
                 status="error",
-                result={"error_type": type(exc).__name__, "error": str(exc)},
+                result={
+                    "error_type": type(exc).__name__,
+                    "error": str(exc),
+                    "failure_type": failure_type_of(exc),
+                },
             )
         _TRACE_RECORDER = None
         raise
@@ -2380,7 +2431,8 @@ def run_ablation_study_cstr(
                     )
 
             except Exception as e:
-                print(f"  ERROR: {e}")
+                failure_type = failure_type_of(e)
+                print(f"  ERROR ({failure_type}): {e}")
                 all_metrics.append(
                     {
                         "fault": fault,
@@ -2390,6 +2442,7 @@ def run_ablation_study_cstr(
                         "success": 0,
                         "reached_end": 0,
                         "abort_reason": "exception",
+                        "failure_type": failure_type,
                         "eval_pass": 0,
                         "wall_time_s": 0.0,
                         "sim_time_s": None,
@@ -2409,6 +2462,7 @@ def run_ablation_study_cstr(
                         "run": run,
                         "llm_model": args.llm_model,
                         "mode": args.mode,
+                        "failure_type": failure_type,
                         "error": str(e),
                     }
                 )

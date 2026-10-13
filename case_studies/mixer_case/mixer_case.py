@@ -20,6 +20,12 @@ if str(CASE_STUDIES_ROOT) not in sys.path:
     sys.path.insert(0, str(CASE_STUDIES_ROOT))
 
 from common.trace_logging import TraceRecorder
+from common.llm_failures import (
+    LLMActionError,
+    classify_exception,
+    failure_type_of,
+    SCHEMA_VALIDATION_ERROR,
+)
 
 from simulation import Simulation
 
@@ -198,6 +204,7 @@ def is_kg_loaded() -> bool:
 
 CURRENT_MODEL = "gpt-4o"  # Default model
 CURRENT_PROMPT_LEVEL = "full"  # Default prompt level
+CURRENT_LLM_TIMEOUT = 120.0  # Per-call LLM timeout in seconds (raise for slower local models)
 
 # Available models
 AVAILABLE_MODELS = [
@@ -905,20 +912,22 @@ def get_prompts_for_level(level: str) -> dict:
 # =============================================================================
 
 
-def _make_llm(model_name: str = None, temperature: float = None):
-    """Create LLM instance. Uses global CURRENT_MODEL if model_name not specified."""
-    global CURRENT_MODEL
+def _make_llm(model_name: str = None, temperature: float = None, timeout: float = None):
+    """Create LLM instance. Uses global CURRENT_MODEL/CURRENT_LLM_TIMEOUT if not specified."""
+    global CURRENT_MODEL, CURRENT_LLM_TIMEOUT
     model = model_name if model_name else CURRENT_MODEL
-    print(f"[LLM] Using model: {model}")
+    if timeout is None:
+        timeout = CURRENT_LLM_TIMEOUT
+    print(f"[LLM] Using model: {model} (timeout={timeout}s)")
     # Auto-select temperature if not specified
     if temperature is None:
         temperature = get_model_temperature(model)
     if model.startswith("gpt"):
-        return ChatOpenAI(model=model, temperature=temperature, timeout=60)
+        return ChatOpenAI(model=model, temperature=temperature, timeout=timeout)
     else:
         # For non-GPT models, return a dummy or default LLM instance
         print(f"[LLM] Warning: Non-GPT model '{model}' may not be supported.")
-        return ChatOllama(model=model, temperature=temperature, timeout=60)
+        return ChatOllama(model=model, temperature=temperature, timeout=timeout)
 
 
 def is_pump_fault(fault: str) -> bool:
@@ -1770,13 +1779,27 @@ Return your decision as JSON with: current_state, next_state, reasoning
     llm = _make_llm()  # Uses global CURRENT_MODEL
     plan_llm = llm.with_structured_output(PathPlan, include_raw=True)
     t0 = time.perf_counter()
-    raw_response = plan_llm.invoke([("system", system_msg), ("user", user_msg)])
-    dt = time.perf_counter() - t0
+    failure_type: Optional[str] = None
+    failure_detail: str = ""
+    try:
+        raw_response = plan_llm.invoke([("system", system_msg), ("user", user_msg)])
+    except Exception as invoke_exc:
+        dt = time.perf_counter() - t0
+        failure_type = classify_exception(invoke_exc)
+        failure_detail = f"invoke_error={invoke_exc}"
+        raw_response = {"raw": None, "parsed": None}
+    else:
+        dt = time.perf_counter() - t0
 
     response = raw_response["parsed"]
+    if failure_type is None and response is None:
+        failure_type = SCHEMA_VALIDATION_ERROR
+        raw_content = getattr(raw_response.get("raw"), "content", raw_response.get("raw"))
+        failure_detail = f"LLM did not return a parsed PathPlan; raw_content={raw_content!r}"
 
     # Token-Usage
-    token_usage = raw_response["raw"].usage_metadata or {}
+    raw_msg = raw_response.get("raw")
+    token_usage = (getattr(raw_msg, "usage_metadata", None) or {}) if raw_msg is not None else {}
     input_tokens = token_usage.get("input_tokens", 0)
     output_tokens = token_usage.get("output_tokens", 0)
 
@@ -1802,6 +1825,16 @@ Return your decision as JSON with: current_state, next_state, reasoning
                 "total_tokens": input_tokens + output_tokens,
             },
             latency_seconds=dt,
+            failure_type=failure_type,
+        )
+
+    if failure_type is not None:
+        print(f"[PLANNING] FAILED type={failure_type}: {failure_detail}")
+        raise LLMActionError(
+            failure_type,
+            f"LLM planning call failed ({failure_type}) for model="
+            f"{CURRENT_MODEL}: {failure_detail}",
+            raw_response=raw_response.get("raw"),
         )
 
     print(f"[PLANNING] Tokens: {input_tokens} in, {output_tokens} out")
@@ -1995,13 +2028,27 @@ Return JSON with: target_state, actions (list of actuator/value pairs), reasonin
     action_llm = llm.with_structured_output(ActionPlan, include_raw=True)
 
     t0 = time.perf_counter()
-    raw_response = action_llm.invoke([("system", system_msg), ("user", user_msg)])
-    dt = time.perf_counter() - t0
+    failure_type: Optional[str] = None
+    failure_detail: str = ""
+    try:
+        raw_response = action_llm.invoke([("system", system_msg), ("user", user_msg)])
+    except Exception as invoke_exc:
+        dt = time.perf_counter() - t0
+        failure_type = classify_exception(invoke_exc)
+        failure_detail = f"invoke_error={invoke_exc}"
+        raw_response = {"raw": None, "parsed": None}
+    else:
+        dt = time.perf_counter() - t0
 
     response = raw_response["parsed"]
+    if failure_type is None and response is None:
+        failure_type = SCHEMA_VALIDATION_ERROR
+        raw_content = getattr(raw_response.get("raw"), "content", raw_response.get("raw"))
+        failure_detail = f"LLM did not return a parsed ActionPlan; raw_content={raw_content!r}"
 
     # Token-Usage
-    token_usage = raw_response["raw"].usage_metadata or {}
+    raw_msg = raw_response.get("raw")
+    token_usage = (getattr(raw_msg, "usage_metadata", None) or {}) if raw_msg is not None else {}
     input_tokens = token_usage.get("input_tokens", 0)
     output_tokens = token_usage.get("output_tokens", 0)
 
@@ -2027,6 +2074,16 @@ Return JSON with: target_state, actions (list of actuator/value pairs), reasonin
                 "total_tokens": input_tokens + output_tokens,
             },
             latency_seconds=dt,
+            failure_type=failure_type,
+        )
+
+    if failure_type is not None:
+        print(f"[ACTION] FAILED type={failure_type}: {failure_detail}")
+        raise LLMActionError(
+            failure_type,
+            f"LLM action call failed ({failure_type}) for model="
+            f"{CURRENT_MODEL}: {failure_detail}",
+            raw_response=raw_response.get("raw"),
         )
 
     print(f"[ACTION] Tokens: {input_tokens} in, {output_tokens} out")
@@ -3140,7 +3197,12 @@ def run_single_experiment(
         if recorder is not None:
             recorder.finalize(
                 status="error",
-                result={"fault": fault, "run": run, "error": str(exc)},
+                result={
+                    "fault": fault,
+                    "run": run,
+                    "error": str(exc),
+                    "failure_type": failure_type_of(exc),
+                },
             )
         _TRACE_RECORDER = None
         raise
@@ -3436,7 +3498,8 @@ def run_ablation_study(
                 )
 
             except Exception as e:
-                print(f"  ERROR: {e}")
+                failure_type = failure_type_of(e)
+                print(f"  ERROR ({failure_type}): {e}")
                 all_results.append(
                     {
                         "model": CURRENT_MODEL,
@@ -3452,6 +3515,7 @@ def run_ablation_study(
                         "planning_accuracy": 0.0,
                         "actuator_accuracy": 0.0,
                         "abort_reason": "exception",
+                        "failure_type": failure_type,
                         "error": str(e),
                         "iteration_details": [],  # Empty list for exceptions
                     }
@@ -3855,6 +3919,12 @@ Examples:
         help="Prompt difficulty level",
     )
     parser.add_argument(
+        "--llm-timeout",
+        type=float,
+        default=120.0,
+        help="Per-call LLM timeout in seconds (raise for slower local models)",
+    )
+    parser.add_argument(
         "--quiet", "-q", action="store_true", help="Reduce output verbosity"
     )
 
@@ -3862,6 +3932,7 @@ Examples:
 
     CURRENT_MODEL = args.model
     CURRENT_PROMPT_LEVEL = args.prompt_level
+    CURRENT_LLM_TIMEOUT = args.llm_timeout
 
     print("=" * 60)
     print("CONFIGURATION")

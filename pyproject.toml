@@ -19,13 +19,13 @@ ignored-modules = ["langgraph", "langchain", "langchain_openai", "langchain_olla
 generated-members = [".*RandomState"]
 
 [tool.pytest.ini_options]
-testpaths = ["case_studies/cstr_case"]
+testpaths = ["case_studies/cstr_case", "tests"]
 python_files = ["test_*.py"]
-pythonpath = ["case_studies", "case_studies/cstr_case"]
+pythonpath = ["case_studies", "case_studies/cstr_case", "case_studies/mixer_case"]
 
 [tool.coverage.run]
 source = ["case_studies/common", "case_studies/cstr_case", "case_studies/mixer_case"]
-omit = ["*/test_*.py"]
+omit = ["*/test_*.py", "tests/*"]
 relative_files = true
 
 [tool.coverage.report]

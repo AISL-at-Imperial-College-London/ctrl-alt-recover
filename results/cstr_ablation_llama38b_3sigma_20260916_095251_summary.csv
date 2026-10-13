@@ -1,0 +1,4 @@
+fault,n,success_mean,success_std,reached_end_mean,eval_pass_mean,reprompts_mean,unsafe_seconds_mean,wall_time_mean,wall_time_std
+fouling,10,0.8,0.42163702135578396,1.0,0.9,2.4,484.3,61.02750762999058,15.600497094965089
+pump_degrade,10,1.0,0.0,1.0,1.0,0.0,153.9,37.599328000005336,1.134999139693569
+cool_stuck_closed,10,0.0,0.0,1.0,0.0,5.0,35.7,100.72297260002233,3.0435583978890626
