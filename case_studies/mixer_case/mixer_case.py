@@ -204,7 +204,9 @@ def is_kg_loaded() -> bool:
 
 CURRENT_MODEL = "gpt-4o"  # Default model
 CURRENT_PROMPT_LEVEL = "full"  # Default prompt level
-CURRENT_LLM_TIMEOUT = 120.0  # Per-call LLM timeout in seconds (raise for slower local models)
+CURRENT_LLM_TIMEOUT = (
+    120.0  # Per-call LLM timeout in seconds (raise for slower local models)
+)
 
 # Available models
 AVAILABLE_MODELS = [
@@ -840,7 +842,9 @@ The UML:StateMachine shows that state_filling_tank_B203 has transitions to multi
 Reasoning: B203 full, sensor_fault doesn't affect pump operation.
 """
 
-ACTION_SYSTEM_PROMPT_NORMAL = ONTOLOGY_CONTEXT + """
+ACTION_SYSTEM_PROMPT_NORMAL = (
+    ONTOLOGY_CONTEXT
+    + """
 
 ## ACTION TASK
 
@@ -851,6 +855,7 @@ Task: Based on the target state from the planning agent, query the Knowledge Gra
 Only(!!!) use the actuator (VDI2206) which are connected to the TARGET STATE provided by the planning agent before via the chain UML:State -> UML:doAction -> UML:Action -> CPSMod:isChangedByActuator.!!! Even if you have potentially other ideas, stick with the version in the KG (ttl.file). Thise actuators are always 1 (on), not 0(closed)!
 
 """
+)
 
 ACTION_FEW_SHOT_NORMAL = """\
 ## EXAMPLES
@@ -865,9 +870,13 @@ Actions: [{"actuator": "valve_in_B202", "value": 1}]
 
 # --- LEVEL: MINIMAL (only ONTOLOGY_CONTEXT + Valid States, no examples) ---
 
-PLANNING_SYSTEM_PROMPT_MINIMAL = ONTOLOGY_CONTEXT + """
+PLANNING_SYSTEM_PROMPT_MINIMAL = (
+    ONTOLOGY_CONTEXT
+    + """
 
-""" + VALID_STATES_STR
+"""
+    + VALID_STATES_STR
+)
 
 PLANNING_FEW_SHOT_MINIMAL = ""  # No examples
 
@@ -1794,12 +1803,18 @@ Return your decision as JSON with: current_state, next_state, reasoning
     response = raw_response["parsed"]
     if failure_type is None and response is None:
         failure_type = SCHEMA_VALIDATION_ERROR
-        raw_content = getattr(raw_response.get("raw"), "content", raw_response.get("raw"))
-        failure_detail = f"LLM did not return a parsed PathPlan; raw_content={raw_content!r}"
+        raw_content = getattr(
+            raw_response.get("raw"), "content", raw_response.get("raw")
+        )
+        failure_detail = (
+            f"LLM did not return a parsed PathPlan; raw_content={raw_content!r}"
+        )
 
     # Token-Usage
     raw_msg = raw_response.get("raw")
-    token_usage = (getattr(raw_msg, "usage_metadata", None) or {}) if raw_msg is not None else {}
+    token_usage = (
+        (getattr(raw_msg, "usage_metadata", None) or {}) if raw_msg is not None else {}
+    )
     input_tokens = token_usage.get("input_tokens", 0)
     output_tokens = token_usage.get("output_tokens", 0)
 
@@ -2043,12 +2058,18 @@ Return JSON with: target_state, actions (list of actuator/value pairs), reasonin
     response = raw_response["parsed"]
     if failure_type is None and response is None:
         failure_type = SCHEMA_VALIDATION_ERROR
-        raw_content = getattr(raw_response.get("raw"), "content", raw_response.get("raw"))
-        failure_detail = f"LLM did not return a parsed ActionPlan; raw_content={raw_content!r}"
+        raw_content = getattr(
+            raw_response.get("raw"), "content", raw_response.get("raw")
+        )
+        failure_detail = (
+            f"LLM did not return a parsed ActionPlan; raw_content={raw_content!r}"
+        )
 
     # Token-Usage
     raw_msg = raw_response.get("raw")
-    token_usage = (getattr(raw_msg, "usage_metadata", None) or {}) if raw_msg is not None else {}
+    token_usage = (
+        (getattr(raw_msg, "usage_metadata", None) or {}) if raw_msg is not None else {}
+    )
     input_tokens = token_usage.get("input_tokens", 0)
     output_tokens = token_usage.get("output_tokens", 0)
 

@@ -70,10 +70,12 @@ class FailureDiagnosis(BaseModel):
         "other",
     ] = Field(..., description="Single best-fit root cause category")
     explanation: str = Field(
-        ..., description="2-4 sentences on what the model actually did and why that caused the failure"
+        ...,
+        description="2-4 sentences on what the model actually did and why that caused the failure",
     )
     suggested_fix: str = Field(
-        ..., description="Short, concrete suggestion: prompt change, timeout change, schema change, etc."
+        ...,
+        description="Short, concrete suggestion: prompt change, timeout change, schema change, etc.",
     )
     confidence: Literal["low", "medium", "high"] = Field(
         ..., description="Confidence in this diagnosis given the context available"
@@ -133,7 +135,9 @@ def find_run_dirs(
     candidates = sorted(trace_dir.glob(f"{case_glob}/*/*/*/run_*"))
 
     def keep(run_dir: Path) -> bool:
-        parts = run_dir.relative_to(trace_dir).parts  # (case, exp_id, model, fault, run_XXX)
+        parts = run_dir.relative_to(
+            trace_dir
+        ).parts  # (case, exp_id, model, fault, run_XXX)
         if len(parts) != 5:
             return False
         _, exp_id, model_dir, fault_dir, _ = parts
@@ -191,7 +195,9 @@ def _truncate(obj: Any, max_chars: int = MAX_FIELD_CHARS) -> Any:
     return obj
 
 
-def collect_llm_calls(run_dir: Path, events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def collect_llm_calls(
+    run_dir: Path, events: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     calls = []
     for ev in events:
         if ev.get("event") != "llm_call":
@@ -205,19 +211,25 @@ def collect_llm_calls(run_dir: Path, events: List[Dict[str, Any]]) -> List[Dict[
         response_path = (ev.get("response_artifact") or {}).get("path")
         prompt_path = (ev.get("prompt_artifact") or {}).get("path")
         if response_path and (run_dir / response_path).exists():
-            record["response"] = json.loads((run_dir / response_path).read_text(encoding="utf-8"))
+            record["response"] = json.loads(
+                (run_dir / response_path).read_text(encoding="utf-8")
+            )
         if prompt_path and (run_dir / prompt_path).exists():
-            record["prompt"] = json.loads((run_dir / prompt_path).read_text(encoding="utf-8"))
+            record["prompt"] = json.loads(
+                (run_dir / prompt_path).read_text(encoding="utf-8")
+            )
         calls.append(record)
     return calls
 
 
-def select_calls(calls: List[Dict[str, Any]], max_calls: int = MAX_CALLS_PER_RUN) -> List[Dict[str, Any]]:
+def select_calls(
+    calls: List[Dict[str, Any]], max_calls: int = MAX_CALLS_PER_RUN
+) -> List[Dict[str, Any]]:
     """Prefer the failing call plus a little trailing context, capped for cost."""
     failing_idx = [i for i, c in enumerate(calls) if c.get("failure_type")]
     if failing_idx:
         idx = failing_idx[-1]
-        window = calls[max(0, idx - max_calls + 1): idx + 1]
+        window = calls[max(0, idx - max_calls + 1) : idx + 1]
     else:
         window = calls[-max_calls:]
     return [_truncate(c) for c in window]
@@ -228,7 +240,9 @@ def select_calls(calls: List[Dict[str, Any]], max_calls: int = MAX_CALLS_PER_RUN
 # =============================================================================
 
 
-def build_context_payload(run_dir: Path, context: Dict[str, Any], outcome_kind: str) -> Dict[str, Any]:
+def build_context_payload(
+    run_dir: Path, context: Dict[str, Any], outcome_kind: str
+) -> Dict[str, Any]:
     calls = collect_llm_calls(run_dir, context["events"])
     return {
         "outcome_kind": outcome_kind,
@@ -245,15 +259,27 @@ def diagnose(payload: Dict[str, Any], analyzer_model: str) -> FailureDiagnosis:
     raw = structured.invoke([("system", SYSTEM_PROMPT), ("user", user_payload)])
     diagnosis = raw.get("parsed") if isinstance(raw, dict) else None
     if diagnosis is None:
-        raw_text = getattr(raw.get("raw") if isinstance(raw, dict) else raw, "content", raw)
-        raise RuntimeError(f"Analyzer model returned no parseable diagnosis. Raw: {raw_text!r}")
+        raw_text = getattr(
+            raw.get("raw") if isinstance(raw, dict) else raw, "content", raw
+        )
+        raise RuntimeError(
+            f"Analyzer model returned no parseable diagnosis. Raw: {raw_text!r}"
+        )
     return diagnosis
 
 
-def write_diagnosis(run_dir: Path, diagnosis: FailureDiagnosis, *, analyzer_model: str, outcome_kind: str) -> Path:
+def write_diagnosis(
+    run_dir: Path,
+    diagnosis: FailureDiagnosis,
+    *,
+    analyzer_model: str,
+    outcome_kind: str,
+) -> Path:
     out = {
         "analyzer_model": analyzer_model,
-        "analyzed_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "analyzed_at_utc": datetime.now(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z"),
         "outcome_kind": outcome_kind,
         "primary_cause": diagnosis.primary_cause,
         "explanation": diagnosis.explanation,
@@ -271,17 +297,50 @@ def write_diagnosis(run_dir: Path, diagnosis: FailureDiagnosis, *, analyzer_mode
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--trace-dir", type=str, default=str(DEFAULT_TRACE_DIR))
     parser.add_argument("--case", type=str, choices=["cstr", "mixer"], default=None)
-    parser.add_argument("--experiment-id", type=str, default=None, help="Substring match against experiment id")
-    parser.add_argument("--model", type=str, nargs="*", default=None, help="Filter to these model dir names, e.g. llama3:8b")
+    parser.add_argument(
+        "--experiment-id",
+        type=str,
+        default=None,
+        help="Substring match against experiment id",
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        nargs="*",
+        default=None,
+        help="Filter to these model dir names, e.g. llama3:8b",
+    )
     parser.add_argument("--fault", type=str, default=None)
-    parser.add_argument("--analyzer-model", type=str, default="gpt-5.1", help="LLM to use for post-hoc failure analysis")
-    parser.add_argument("--force", action="store_true", help="Re-analyze runs that already have failure_analysis.json")
-    parser.add_argument("--limit", type=int, default=0, help="Cap the number of runs analyzed (0 = no cap)")
-    parser.add_argument("--dry-run", action="store_true", help="List runs that would be analyzed; make no API calls")
-    parser.add_argument("--summary-csv", type=str, default=None, help="Where to write the aggregate CSV")
+    parser.add_argument(
+        "--analyzer-model",
+        type=str,
+        default="gpt-5.1",
+        help="LLM to use for post-hoc failure analysis",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Re-analyze runs that already have failure_analysis.json",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=0,
+        help="Cap the number of runs analyzed (0 = no cap)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="List runs that would be analyzed; make no API calls",
+    )
+    parser.add_argument(
+        "--summary-csv", type=str, default=None, help="Where to write the aggregate CSV"
+    )
     args = parser.parse_args()
 
     trace_dir = Path(args.trace_dir).expanduser().resolve()
@@ -333,9 +392,18 @@ def main() -> None:
             summary_rows.append(base_row)
             continue
 
-        to_analyze.append({"run_dir": run_dir, "context": context, "outcome_kind": outcome_kind, "row": base_row})
+        to_analyze.append(
+            {
+                "run_dir": run_dir,
+                "context": context,
+                "outcome_kind": outcome_kind,
+                "row": base_row,
+            }
+        )
 
-    print(f"Found {len(run_dirs)} run(s) under {trace_dir}; {len(to_analyze)} need analysis.")
+    print(
+        f"Found {len(run_dirs)} run(s) under {trace_dir}; {len(to_analyze)} need analysis."
+    )
     if args.limit and len(to_analyze) > args.limit:
         print(f"Capping to --limit {args.limit}")
         to_analyze = to_analyze[: args.limit]
@@ -351,9 +419,16 @@ def main() -> None:
             continue
 
         try:
-            payload = build_context_payload(run_dir, item["context"], item["outcome_kind"])
+            payload = build_context_payload(
+                run_dir, item["context"], item["outcome_kind"]
+            )
             diagnosis = diagnose(payload, args.analyzer_model)
-            write_diagnosis(run_dir, diagnosis, analyzer_model=args.analyzer_model, outcome_kind=item["outcome_kind"])
+            write_diagnosis(
+                run_dir,
+                diagnosis,
+                analyzer_model=args.analyzer_model,
+                outcome_kind=item["outcome_kind"],
+            )
             row.update(
                 primary_cause=diagnosis.primary_cause,
                 confidence=diagnosis.confidence,
@@ -377,7 +452,11 @@ def main() -> None:
         return
 
     df = pd.DataFrame(summary_rows)
-    summary_path = Path(args.summary_csv) if args.summary_csv else trace_dir / "failure_analysis_summary.csv"
+    summary_path = (
+        Path(args.summary_csv)
+        if args.summary_csv
+        else trace_dir / "failure_analysis_summary.csv"
+    )
     df.to_csv(summary_path, index=False)
     print(f"\nSummary written to: {summary_path}")
 

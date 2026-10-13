@@ -158,7 +158,9 @@ def is_kg_loaded() -> bool:
 # =============================================================================
 
 
-def _make_llm(model: str = "llama3:8b", temperature: float = 0.0, timeout: float = 120.0):
+def _make_llm(
+    model: str = "llama3:8b", temperature: float = 0.0, timeout: float = 120.0
+):
     """
     Uses OpenAI if model starts with 'gpt', else Ollama.
 
@@ -1193,7 +1195,9 @@ def action_propose(state: GraphState) -> GraphState:
     action_kg = get_action_kg_context() or ""
     sym = state.get("symptoms", {}) or {}
 
-    ACTION_SYSTEM_PROMPT_KG = dedent("""
+    ACTION_SYSTEM_PROMPT_KG = (
+        dedent(
+            """
         You are the **Corrective Setpoint Action Agent** for a Continuous Stirred Tank Reactor (CSTR).
 
         You must propose ONLY these setpoints:
@@ -1231,7 +1235,11 @@ def action_propose(state: GraphState) -> GraphState:
         3) If u_cool/u_valve/u_pump is near saturation (>=0.95), avoid pushing it further.
         4) If u_cool is saturated, prefer reducing Fin_sp before changing T_sp.
         5) Do not change setpoints without stating which KG relationship justifies it (cite PO6/PO7/PO8 in reasoning).
-        """).strip() + "\n\n" + action_kg
+        """
+        ).strip()
+        + "\n\n"
+        + action_kg
+    )
 
     user_prompt = f"""
         CURRENT SNAPSHOT:
